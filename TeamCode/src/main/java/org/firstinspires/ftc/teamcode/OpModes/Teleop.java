@@ -30,16 +30,18 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            s_drivetrain.drive(
-                    gamepad.getLeftY(),
-                    -gamepad.getLeftX(),
-                    gamepad.getRightX()
-            );
+            s_drivetrain.runMoter();
 
-            aPressed = gamepad.isDown(GamepadKeys.Button.A);
-            xPressed = gamepad.isDown(GamepadKeys.Button.X);
+//            s_drivetrain.drive(
+//                    gamepad.getLeftY(),
+//                    -gamepad.getLeftX(),
+//                    gamepad.getRightX()
+//            );
 
-            gamepad.readButtons();
+//            aPressed = gamepad.isDown(GamepadKeys.Button.A);
+//            xPressed = gamepad.isDown(GamepadKeys.Button.X);
+
+//            gamepad.readButtons();
 
             if (xPressed) {
                 s_drivetrain.resetYaw();
