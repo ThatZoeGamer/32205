@@ -101,8 +101,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void periodic(Telemetry telemetry) {
-        telemetry.addLine("Drive train");
-        telemetry.addData("Heading: ", getHeading());
+        telemetry.addData("IMU Heading: ", getHeading());
     }
 
 
