@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,9 +17,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
+
+    private Limelight3A limelight;
 
     GamepadEx gamepad;
     boolean aPressed;
@@ -31,6 +38,17 @@ public class Teleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         gamepad = new GamepadEx(gamepad1);
+
+        //limelight
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();
+        LLResult result = limelight.getLatestResult();
+        LLStatus status = limelight.getStatus();
+        telemetry.addData("Pipeline", "%d - %s",
+                status.getPipelineIndex(),
+                status.getPipelineType());
+        telemetry.addData("LIMELIGHT FPS", status.getFps());
 
         s_drivetrain = new Drivetrain(hardwareMap);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
