@@ -20,9 +20,20 @@ public class Odometry extends SubsystemBase {
         this.telemetry = m_telemetry;
     }
     public void resetPosition() {
-        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0 ,0, AngleUnit.DEGREES, 0));
+        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0 ,0, AngleUnit.DEGREES, getPinHeading()));
     }
 
+    public void resetHeading() {
+        pinpoint.setHeading(0, AngleUnit.DEGREES);
+    }
+
+    public Pose2D getPose() {
+        return pinpoint.getPosition();
+    }
+
+    public double getPinHeading() {
+        return pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
+    }
 
     public void periodic(Telemetry telemetry) {
         Pose2D pose2D = pinpoint.getPosition();
@@ -43,7 +54,7 @@ public class Odometry extends SubsystemBase {
          *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
          *  Forward of center is a positive number, backwards is a negative number.
          */
-        pinpoint.setOffsets(-84.0, -168.0, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        pinpoint.setOffsets(-1, 0, DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

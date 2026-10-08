@@ -32,7 +32,7 @@ public class Teleop extends LinearOpMode {
     public void runOpMode() {
         gamepad = new GamepadEx(gamepad1);
 
-        s_drivetrain = new Drivetrain(hardwareMap);
+        s_drivetrain = new Drivetrain(hardwareMap, m_telemetry);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
 
@@ -52,7 +52,7 @@ public class Teleop extends LinearOpMode {
             gamepad.readButtons();
 
             if (xPressed) { 
-                s_drivetrain.resetYaw();
+                o_odometry.resetHeading();
             }
 
             if (aPressed) {

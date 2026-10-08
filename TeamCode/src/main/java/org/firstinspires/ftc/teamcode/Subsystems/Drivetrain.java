@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,13 +25,15 @@ public class Drivetrain extends SubsystemBase {
 
     private final BHI260IMU IMU;
 
+    private final Odometry odom;
     private double yawOffset;
 
-    public Drivetrain(HardwareMap hardwaremap) {
+    public Drivetrain(HardwareMap hardwaremap, MultipleTelemetry m_telemetry) {
         frontLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontLeftMotor);
         frontRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontRightMotor);
         backLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backLeftMotor);
         backRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backRightMotor);
+        odom = new Odometry(m_telemetry, hardwaremap);
 //
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -43,15 +46,16 @@ public class Drivetrain extends SubsystemBase {
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         IMU = hardwaremap.get(BHI260IMU.class, "imu");
-        IMU.initialize(new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)
-        )
-        );
+//
         //what
-
-        yawOffset = IMU.getRobotYawPitchRollAngles().getYaw() - Constants.DrivetrainConstants.controlHubOffset;
+//        IMU.initialize(new IMU.Parameters(
+//                new RevHubOrientationOnRobot(
+//                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,//right
+//                RevHubOrientationOnRobot.UsbFacingDirection.UP)//up
+//        )
+//        );
+//        yawOffset = IMU.getRobotYawPitchRollAngles().getYaw() - Constants.DrivetrainConstants.controlHubOffset;
+        yawOffset = odom.getPinHeading() - Constants.DrivetrainConstants.controlHubOffset;
     }
 
     public void drive(double driveX, double driveY, double rotation) {
@@ -81,8 +85,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public double getRawHeading() {
-        Orientation angles = IMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return angles.firstAngle;
+//        Orientation angles = IMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        return angles.firstAngle;
+        return odom.getPinHeading();
     }
     public double getHeading() {
         double heading = getRawHeading() - yawOffset;
