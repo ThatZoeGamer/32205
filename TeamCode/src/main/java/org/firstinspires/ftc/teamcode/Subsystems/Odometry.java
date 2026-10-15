@@ -35,7 +35,7 @@ public class Odometry extends SubsystemBase {
         return pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
     }
 
-    public void periodic(Telemetry telemetry) {
+    public void periodic() {
         Pose2D pose2D = pinpoint.getPosition();
         this.telemetry.addData("X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
         this.telemetry.addData("Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
