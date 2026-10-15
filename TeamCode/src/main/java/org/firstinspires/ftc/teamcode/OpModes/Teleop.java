@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.colorsensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -32,6 +33,8 @@ public class Teleop extends LinearOpMode {
     boolean xPressed;
 
     Drivetrain s_drivetrain;
+
+    colorsensor s_colorsensor;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
 
@@ -49,8 +52,8 @@ public class Teleop extends LinearOpMode {
                 status.getPipelineIndex(),
                 status.getPipelineType());
         telemetry.addData("LIMELIGHT FPS", status.getFps());
-
         s_drivetrain = new Drivetrain(hardwareMap);
+        s_colorsensor = new colorsensor(hardwareMap);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
 
@@ -80,6 +83,14 @@ public class Teleop extends LinearOpMode {
             s_drivetrain.periodic(telemetry);
             o_odometry.periodic(telemetry);
             m_telemetry.update();
+
+            //ColorSensor
+            telemetry.addData("LED Enabled:", s_colorsensor.bLedOn ? "True" : "False");
+            telemetry.addData("Clear:", s_colorsensor.alpha());
+            telemetry.addData("Red:  ", s_colorsensor.red());
+            telemetry.addData("Green:", s_colorsensor.green());
+            telemetry.addData("Blue: ", s_colorsensor.blue());
+
 
 
         }
