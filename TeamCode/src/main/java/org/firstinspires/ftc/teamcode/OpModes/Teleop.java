@@ -23,6 +23,8 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.List;
+
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
 
@@ -46,20 +48,25 @@ public class Teleop extends LinearOpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
-        LLResult result = limelight.getLatestResult();
-        LLStatus status = limelight.getStatus();
-        telemetry.addData("Pipeline", "%d - %s",
-                status.getPipelineIndex(),
-                status.getPipelineType());
-        telemetry.addData("LIMELIGHT FPS", status.getFps());
         s_drivetrain = new Drivetrain(hardwareMap);
         s_colorsensor = new colorsensor(hardwareMap);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
 
+
         waitForStart();
 
         while (opModeIsActive()) {
+            LLResult result = limelight.getLatestResult();
+            LLStatus status = limelight.getStatus();
+            List<LLResultTypes.DetectorResult> detectedObjects = result.getDetectorResults();
+            int totalCount = detectedObjects.size();
+            m_telemetry.addData("Target Status", "Visible");
+            m_telemetry.addData("Total Objects Counted", totalCount);
+            m_telemetry.addData("Pipeline", "%d - %s",
+                    status.getPipelineIndex(),
+                    status.getPipelineType());
+            m_telemetry.addData("LIMELIGHT FPS", status.getFps());
 
             s_drivetrain.drive(
                     gamepad.getLeftY(),
