@@ -24,11 +24,8 @@ public class colorsensor extends SubsystemBase {
         final float values[] = hsvValues;
 
 
-        int relativeLayoutId = BlocksOpModeCompanion.hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", BlocksOpModeCompanion.hardwareMap.appContext.getPackageName());
-        final View relativeLayout = ((Activity) BlocksOpModeCompanion.hardwareMap.appContext).findViewById(relativeLayoutId);
 
-
-        colorSensor = BlocksOpModeCompanion.hardwareMap.get(ColorSensor.class, "sensor_color");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
     }
 
     public void bLedOn() {
