@@ -22,6 +22,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.util.Range;
+import java.util.Arrays;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class Teleop extends LinearOpMode {
     GamepadEx gamepad;
     boolean aPressed;
     boolean xPressed;
+
+    boolean yPressed;
 
     Drivetrain s_drivetrain;
 
@@ -52,6 +55,9 @@ public class Teleop extends LinearOpMode {
         s_colorsensor = new colorsensor(hardwareMap);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
+        String Ball = "";
+        int totalCount = 0;
+        String[] Balls = new String[3];
 
 
         waitForStart();
@@ -60,13 +66,40 @@ public class Teleop extends LinearOpMode {
             LLResult result = limelight.getLatestResult();
             LLStatus status = limelight.getStatus();
             List<LLResultTypes.DetectorResult> detectedObjects = result.getDetectorResults();
-            int totalCount = detectedObjects.size();
             m_telemetry.addData("Target Status", "Visible");
-            m_telemetry.addData("Total Objects Counted", totalCount);
             m_telemetry.addData("Pipeline", "%d - %s",
                     status.getPipelineIndex(),
                     status.getPipelineType());
             m_telemetry.addData("LIMELIGHT FPS", status.getFps());
+
+
+            if(s_colorsensor.red() > 80) {
+                Ball = "Red Nectar";
+                Balls[totalCount] = "Red";
+                totalCount++;
+            } else if(s_colorsensor.blue() > 80) {
+                Ball = "Blue Nectar";
+                Balls[totalCount] = "Blue";
+                totalCount++;
+            } else if(s_colorsensor.green() > 120) {
+                Ball = "Pollen";
+                Balls[totalCount] = "Pollen";
+                totalCount++;
+            }
+
+            yPressed = gamepad.isDown(GamepadKeys.Button.Y);
+            if(yPressed = true) {
+                totalCount = 0;
+                for (int i = 0; i < 5; i++) {
+                    Balls[i] = "null";
+                }
+            }
+            String order = Arrays.toString(Balls);
+
+
+            telemetry.addData("Ball in Intake: ", Ball);
+            m_telemetry.addData("Total Objects Counted", totalCount);
+            m_telemetry.addData("Order of Balls", order);
 
             s_drivetrain.drive(
                     gamepad.getLeftY(),
