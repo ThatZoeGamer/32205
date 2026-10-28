@@ -8,13 +8,13 @@ import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-public class colorsensor extends SubsystemBase {
+public class ColourSensor extends SubsystemBase {
 
     public boolean bLedOn = true;
     ColorSensor colorSensor;    // Hardware Device Object
 
 
-    public colorsensor(HardwareMap hardwareMap) {
+    public ColourSensor(HardwareMap hardwareMap) {
 
         boolean bPrevState = false;
         boolean bCurrState = false;
