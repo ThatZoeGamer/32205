@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Intake extends SubsystemBase {
     private final DcMotorEx intakeMotor;
-    private MultipleTelemetry telemetry;
+    private final MultipleTelemetry telemetry;
 
     public Intake(HardwareMap hardwaremap, MultipleTelemetry telemetry) {
         intakeMotor = hardwaremap.get(DcMotorEx.class, Constants.intakeConstants.intakeMotorId);
@@ -31,10 +31,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void stop() {
-        intakeMotor.setPower(0);
+        runIntake(0);
     }
 
-    public void periodic() {
+    public void periodic(MultipleTelemetry telemetry) {
         telemetry.addData("Direction", intakeMotor.getDirection());
         telemetry.addData("Power", intakeMotor.getPower());
     }

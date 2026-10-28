@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.teamcode.Utilities.PIDController;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.acmerobotics.dashboard.config.Config;
 public class Constants {
-
     public static final class DrivetrainConstants {
         public static final String frontLeftMotor = "frontLeft0";
         public static final String frontRightMotor = "frontRight1";
@@ -23,4 +24,12 @@ public class Constants {
     public static class intakeConstants {
         public static String intakeMotorId = "intake";
     }
+
+    public static class shooterConstants {
+        public static final String shooterMotorLid = "sMotorL"; //1
+        public static final String shooterMotorRid = "sMotorR"; //0
+        public static final String axisServoId = "axisServo";
+        public static final double ticksPerRev = 24;
+    }
+
 }

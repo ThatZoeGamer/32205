@@ -14,7 +14,7 @@ public class Odometry extends SubsystemBase {
     GoBildaPinpointDriver pinpoint;
     MultipleTelemetry telemetry;
     public Odometry (MultipleTelemetry m_telemetry, HardwareMap hardwareMap){
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver .class, "pinpoint");
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         configurePinpoint();
         resetPosition();
         this.telemetry = m_telemetry;
@@ -70,8 +70,8 @@ public class Odometry extends SubsystemBase {
          * increase when you move the robot forward. And the Y (strafe) pod should increase when
          * you move the robot to the left.
          */
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         /*
          * Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
