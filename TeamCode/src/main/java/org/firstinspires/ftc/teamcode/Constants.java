@@ -19,8 +19,4 @@ public class Constants {
 
         public static final double controlHubOffset =  90;
     }
-
-    public static class intakeConstants {
-        public static String intakeMotorId = "intake";
-    }
 }

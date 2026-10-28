@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 
 @TeleOp(name="Delta", group="Teleop")
@@ -17,12 +23,8 @@ public class Teleop extends LinearOpMode {
     GamepadEx gamepad;
     boolean aPressed;
     boolean xPressed;
-    double intakeRun;
-    double outtakeRun;
 
     Drivetrain s_drivetrain;
-
-    Intake s_intake;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
 
@@ -31,7 +33,6 @@ public class Teleop extends LinearOpMode {
         gamepad = new GamepadEx(gamepad1);
 
         s_drivetrain = new Drivetrain(hardwareMap, m_telemetry);
-        s_intake = new Intake(hardwareMap, m_telemetry);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
 
@@ -44,16 +45,6 @@ public class Teleop extends LinearOpMode {
                     -gamepad.getLeftX(),
                     gamepad.getRightX()
             );
-
-            if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) == 0) {
-                s_intake.runIntake(gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
-                s_intake.runOuttake(0);
-            } else if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) == 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0) {
-                s_intake.runOuttake(gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
-                s_intake.runIntake(0);
-            } else {
-                s_intake.stop();
-            }
 
             aPressed = gamepad.isDown(GamepadKeys.Button.A);
             xPressed = gamepad.isDown(GamepadKeys.Button.X);
@@ -68,10 +59,11 @@ public class Teleop extends LinearOpMode {
                 o_odometry.resetPosition();
             }
 
-            s_drivetrain.periodic();
-            s_intake.periodic();
-            o_odometry.periodic();
+            s_drivetrain.periodic(telemetry);
+            o_odometry.periodic(telemetry);
             m_telemetry.update();
+
+
         }
     }
 }
