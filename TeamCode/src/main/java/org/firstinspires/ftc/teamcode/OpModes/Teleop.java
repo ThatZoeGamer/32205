@@ -12,7 +12,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.teamcode.Configs;
-import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
+//import org.firstinspires.ftc.teamcode.Subsystems.colorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
@@ -34,10 +34,11 @@ public class Teleop extends LinearOpMode {
     Intake s_intake;
     Drivetrain s_drivetrain;
     Limelight3A limelight;
-    ColourSensor s_coloursensor;
     Shooter s_shooter;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
+//    colorSensor s_colorsensor;
+
 
     @Override
     public void runOpMode() {
@@ -48,6 +49,7 @@ public class Teleop extends LinearOpMode {
         s_shooter = new Shooter(hardwareMap, m_telemetry);
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         o_odometry = new Odometry(m_telemetry, hardwareMap);
+//        s_colorsensor = new colorSensor(hardwareMap);
 
         //limelight
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -65,22 +67,10 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             s_drivetrain.drive(
-                    gamepad.getLeftY(),
-                    -gamepad.getLeftX(),
+                    -gamepad.getLeftY(),
+                    gamepad.getLeftX(),
                     gamepad.getRightX()
             );
-
-            if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) == 0) {
-                s_intake.runIntake(gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
-//                s_intake.runOuttake(0);
-            }
-            else if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) == 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0) {
-                s_intake.runOuttake(gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
-//                s_intake.runIntake(0);
-            }
-            else {
-                s_intake.stop();
-            }
 //            if (s_shooter.getCurrent()>Configs.shooterConfigs.pollenCurrentThresh) {
 //
 //
@@ -113,15 +103,27 @@ public class Teleop extends LinearOpMode {
                 o_odometry.resetPosition();
             }
 
+            if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) == 0) {
+                s_intake.runIntake(gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
+//                s_intake.runOuttake(0);
+            }
+            else if (gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) == 0 && gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0) {
+                s_intake.runOuttake(gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
+//                s_intake.runIntake(0);
+            }
+            else {
+                s_intake.stop();
+            }
+
             s_drivetrain.periodic();
             s_intake.periodic(m_telemetry);
             o_odometry.periodic();
             s_shooter.periodic(m_telemetry);
-            telemetry.addData("LED Enabled:", s_coloursensor.bLedOn ? "True" : "False");
-            telemetry.addData("Clear:", s_coloursensor.alpha());
-            telemetry.addData("Red:  ", s_coloursensor.red());
-            telemetry.addData("Green:", s_coloursensor.green());
-            telemetry.addData("Blue: ", s_coloursensor.blue());
+//            m_telemetry.addData("LED Enabled:", s_colorsensor.bLedOn ? "True" : "False");
+//            m_telemetry.addData("Clear:", s_colorsensor.alpha());
+//            m_telemetry.addData("Red:  ", s_colorsensor.red());
+//            m_telemetry.addData("Green:", s_colorsensor.green());
+//            m_telemetry.addData("Blue: ", s_colorsensor.blue());
             m_telemetry.update();
         }
     }
