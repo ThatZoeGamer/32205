@@ -28,13 +28,13 @@ public class Drivetrain extends SubsystemBase {
     private final Odometry odom;
     private double yawOffset;
 
-    public Drivetrain(HardwareMap hardwaremap, MultipleTelemetry m_telemetry) {
+    public Drivetrain(HardwareMap hardwaremap) {
         frontLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontLeftMotor);
         frontRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontRightMotor);
         backLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backLeftMotor);
         backRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backRightMotor);
-        odom = new Odometry(m_telemetry, hardwaremap);
-//
+        odom = new Odometry(hardwaremap);
+
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -46,15 +46,7 @@ public class Drivetrain extends SubsystemBase {
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         IMU = hardwaremap.get(BHI260IMU.class, "imu");
-//
-        //what
-//        IMU.initialize(new IMU.Parameters(
-//                new RevHubOrientationOnRobot(
-//                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,//right
-//                RevHubOrientationOnRobot.UsbFacingDirection.UP)//up
-//        )
-//        );
-//        yawOffset = IMU.getRobotYawPitchRollAngles().getYaw() - Constants.DrivetrainConstants.controlHubOffset;
+
         yawOffset = odom.getPinHeading() - Constants.DrivetrainConstants.controlHubOffset;
     }
 
@@ -63,13 +55,13 @@ public class Drivetrain extends SubsystemBase {
         double botHeading = getHeading();
         double headingRadians = Math.toRadians(botHeading);
 
-        double sin =  Math.sin(-headingRadians);
-        double cos =  Math.cos(-headingRadians);
+        double sin = Math.sin(-headingRadians);
+        double cos = Math.cos(-headingRadians);
 
-        double fieldOrientedX = driveX * cos - driveY * sin;
+        double fieldOrientedX = driveX * cos - driveY * sin * Constants.DrivetrainConstants.strafingBalancer;
         double fieldOrientedY = driveX * sin + driveY * cos;
 
-        fieldOrientedX *= Constants.DrivetrainConstants.strafingBalancer;
+//        fieldOrientedX *= Constants.DrivetrainConstants.strafingBalancer;
 
         double denominator = Math.max(Math.abs(fieldOrientedY) + Math.abs(fieldOrientedX) + Math.abs(rotation), 1);
 
@@ -85,14 +77,13 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public double getRawHeading() {
-//        Orientation angles = IMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//        return angles.firstAngle;
         return odom.getPinHeading();
     }
+
     public double getHeading() {
         double heading = getRawHeading() - yawOffset;
 
-        if(heading > 180) {
+        if (heading > 180) {
             heading -= 360;
         } else if (heading < -180) {
             heading += 360;
@@ -105,9 +96,5 @@ public class Drivetrain extends SubsystemBase {
         yawOffset = getRawHeading() - Constants.DrivetrainConstants.controlHubOffset;
     }
 
-    public void periodic(Telemetry telemetry) {
-        telemetry.addData("IMU Heading: ", getHeading());
-    }
-
-
+    public void periodic(MultipleTelemetry telemetry) {}
 }

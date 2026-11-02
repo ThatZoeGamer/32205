@@ -12,12 +12,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class Odometry extends SubsystemBase {
     GoBildaPinpointDriver pinpoint;
-    MultipleTelemetry telemetry;
-    public Odometry (MultipleTelemetry m_telemetry, HardwareMap hardwareMap){
+    public Odometry (HardwareMap hardwareMap){
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         configurePinpoint();
         resetPosition();
-        this.telemetry = m_telemetry;
     }
     public void resetPosition() {
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0 ,0, AngleUnit.DEGREES, getPinHeading()));
@@ -35,11 +33,11 @@ public class Odometry extends SubsystemBase {
         return pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
     }
 
-    public void periodic() {
+    public void periodic(MultipleTelemetry telemetry) {
         Pose2D pose2D = pinpoint.getPosition();
-        this.telemetry.addData("X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
-        this.telemetry.addData("Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
-        this.telemetry.addData(" Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
+        telemetry.addData("Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
+        telemetry.addData(" Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
         pinpoint.update();
     }
 
