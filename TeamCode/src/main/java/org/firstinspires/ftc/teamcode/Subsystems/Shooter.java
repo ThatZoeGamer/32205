@@ -41,6 +41,7 @@ public class Shooter extends SubsystemBase {
         motorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorR.setDirection(DcMotorSimple.Direction.REVERSE);
         motorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
     public void setSetpoint(double desiredSetpoint) {
         setpoint = desiredSetpoint;
