@@ -5,8 +5,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class Configs {
     @Config
     public static final class intakeConfigs {
-        public static double intakeTriggerThresh = 0.5;
-        public static double outtakeTriggerThresh = 0.5;
+        public static double intakeTriggerThresh = 0;
+        public static double outtakeTriggerThresh = 0;
     }
     @Config
     public static final class shooterConfigs {

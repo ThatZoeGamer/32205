@@ -66,9 +66,9 @@ public class Teleop extends LinearOpMode {
             m_telemetry.update();
 
             s_drivetrain.drive(
-                    -gamepad.getLeftY(),
-                    gamepad.getLeftX(),
-                    -gamepad.getRightX()
+                    gamepad.getLeftY(),
+                    -gamepad.getLeftX(),
+                    gamepad.getRightX()
             );
             netIntakePower = Math.max(0, (gamepad.getTrigger(leftTrigger) - Configs.intakeConfigs.intakeTriggerThresh))
                     - Math.max(0, (gamepad.getTrigger(rightTrigger) - Configs.intakeConfigs.outtakeTriggerThresh));
