@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
@@ -40,6 +41,7 @@ public class Teleop extends LinearOpMode {
     Shooter s_shooter;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
+    Turret s_turret;
     double netIntakePower;
 
     @Override
@@ -53,6 +55,7 @@ public class Teleop extends LinearOpMode {
         s_coloursensor = new ColourSensor(hardwareMap);
         s_intake = new Intake(hardwareMap);
         s_shooter = new Shooter(hardwareMap);
+        s_turret = new Turret(hardwareMap);
 
         waitForStart();
 
@@ -83,6 +86,12 @@ public class Teleop extends LinearOpMode {
             rbPressed = gamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
 
             gamepad.readButtons();
+
+            if(lDpadPressed) {
+                s_turret.turnLeft();
+            } else if(rDpadPressed) {
+                s_turret.turnRight();
+            }
 
             if (xPressed) {
                 o_odometry.resetHeading();

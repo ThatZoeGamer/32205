@@ -32,4 +32,8 @@ public class Constants {
         public static final double ticksPerRev = 24;
     }
 
+    public static class turretConstants {
+        public static final String turretMotorid = "turretMotor";
+    }
+
 }
