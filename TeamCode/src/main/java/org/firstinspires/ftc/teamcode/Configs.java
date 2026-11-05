@@ -9,6 +9,18 @@ public class Configs {
         public static double outtakeTriggerThresh = 0.5;
     }
     @Config
+    public static final class turretConfigs {
+        public static double turretP = 0;
+        public static double turretI = 0;
+
+        public static double turretD = 0;
+
+        public static double maxSpeed = 1;
+
+        public static double positionTolerance = 10.0;
+
+    }
+    @Config
     public static final class shooterConfigs {
         public static double shooterP = 0.001;
         public static double shooterI = 0;

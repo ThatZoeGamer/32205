@@ -18,6 +18,7 @@ public class Shooter extends SubsystemBase {
     private final DcMotorEx motorR;
 //    private final ServoEx axisMotor;
     private final PIDController shooterController;
+
     private final SimpleMotorFeedforward shooterFF;
     private double setpoint;
     private double currentVelocity;
@@ -27,6 +28,8 @@ public class Shooter extends SubsystemBase {
         motorL = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorLid);
         motorR = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorRid);
 //        axisMotor = hardwareMap.get(ServoEx.class, Constants.axisServoId);
+
+
 
         shooterController = new PIDController(
                 Configs.shooterConfigs.shooterP,
