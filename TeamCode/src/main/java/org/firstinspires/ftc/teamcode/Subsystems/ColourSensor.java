@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import android.app.Activity;
 import android.view.View;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,7 +14,10 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 public class ColourSensor extends SubsystemBase {
 
     public boolean bLedOn = true;
+
     ColorSensor colourSensor;    // Hardware Device Object
+
+
 
     public ColourSensor(HardwareMap hardwareMap) {
 
@@ -22,6 +26,7 @@ public class ColourSensor extends SubsystemBase {
 
         float hsvValues[] = {0F,0F,0F};
         final float values[] = hsvValues;
+
 
 //        int relativeLayoutId = BlocksOpModeCompanion.hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", BlocksOpModeCompanion.hardwareMap.appContext.getPackageName());
 //        final View relativeLayout = ((Activity) BlocksOpModeCompanion.hardwareMap.appContext).findViewById(relativeLayoutId);

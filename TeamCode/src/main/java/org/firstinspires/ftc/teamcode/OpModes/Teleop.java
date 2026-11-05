@@ -19,10 +19,14 @@ import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 
+import java.util.Arrays;
+
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
 
     GamepadEx gamepad;
+    ColourSensor s_coloursensor;
+
     boolean aPressed;
     boolean xPressed;
     boolean yPressed;
@@ -36,7 +40,6 @@ public class Teleop extends LinearOpMode {
     Intake s_intake;
     Drivetrain s_drivetrain;
     Limelight s_limelight;
-    ColourSensor s_coloursensor;
     Shooter s_shooter;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
@@ -83,6 +86,37 @@ public class Teleop extends LinearOpMode {
             rbPressed = gamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
 
             gamepad.readButtons();
+
+            String Ball = "";
+            int totalCount = 0;
+            String[] Balls = new String[3];
+
+            if(s_coloursensor.red() > 80) {
+                Ball = "Red Nectar";
+                Balls[totalCount] = "Red";
+                totalCount++;
+            } else if(s_coloursensor.blue() > 80) {
+                Ball = "Blue Nectar";
+                Balls[totalCount] = "Blue";
+                totalCount++;
+            } else if(s_coloursensor.green() > 120) {
+                Ball = "Pollen";
+                Balls[totalCount] = "Pollen";
+                totalCount++;
+            }
+
+            yPressed = gamepad.isDown(GamepadKeys.Button.Y);
+            if(yPressed = true) {
+                totalCount = 0;
+                for (int i = 0; i < 5; i++) {
+                    Balls[i] = "null";
+                }
+            }
+            String order = Arrays.toString(Balls);
+
+            telemetry.addData("Ball in Intake: ", Ball);
+            telemetry.addData("Total Objects Counted", totalCount);
+            telemetry.addData("Order of Balls", order);
 
             if (xPressed) {
                 o_odometry.resetHeading();
