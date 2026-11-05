@@ -4,6 +4,15 @@ import com.acmerobotics.dashboard.config.Config;
 
 public class Configs {
     @Config
+    public static final class toggles {
+        public static boolean blueTeam = true;
+        public static boolean intakeTelemetry = true;
+        public static boolean shooterTelemetry = true;
+        public static boolean odomTelemetry = true;
+        public static boolean limelightTelemetry = true;
+        public static boolean colourSensorTelemetry = true;
+    }
+    @Config
     public static final class intakeConfigs {
         public static double intakeTriggerThresh = 0;
         public static double outtakeTriggerThresh = 0;
@@ -17,6 +26,8 @@ public class Configs {
         public static  double shooterKv = 0.000;
         public static double shooterSetpointTol = 10;
         public static double maxSpeed = 1;
+//        public static double manuelLeftVelocity = 0.25;
+//        public static double manuelRightVelocity = 0.25;
         public static double manualShooterVelocity = 0.25;
         public static double baseCurrent = 3.7;
         public static double pollenCurrentThresh = 10;

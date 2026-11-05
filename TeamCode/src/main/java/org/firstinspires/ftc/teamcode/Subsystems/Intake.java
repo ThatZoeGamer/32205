@@ -16,22 +16,29 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Intake extends SubsystemBase {
     private final DcMotorEx intakeMotor;
+    private final MultipleTelemetry telemetry;
 
-    public Intake(HardwareMap hardwaremap) {
+    public Intake(HardwareMap hardwaremap, MultipleTelemetry telemetry) {
         intakeMotor = hardwaremap.get(DcMotorEx.class, Constants.intakeConstants.intakeMotorId);
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.telemetry = telemetry;
     }
 
-    public void runIntake(double power) {
-        intakeMotor.setPower(power);
+    public void runIntake(GamepadEx gamepad) {
+        if(gamepad.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+            intakeMotor.setPower(-gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
+        } else {
+            intakeMotor.setPower(-gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
+        }
     }
 
     public void stop() {
         intakeMotor.setPower(0);
     }
 
-    public void periodic(MultipleTelemetry telemetry) {
+    public void periodic(MultipleTelemetry telemetry, boolean toggle) {
+//        this.telemetry.setAutoClear(!toggle);
 //        telemetry.addLine("Intake: ")
         telemetry.addData("Direction", intakeMotor.getDirection());
         telemetry.addData("Power", intakeMotor.getPower());

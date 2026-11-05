@@ -21,9 +21,9 @@ public class Shooter extends SubsystemBase {
     private final SimpleMotorFeedforward shooterFF;
     private double setpoint;
     private double currentVelocity;
-    private boolean lastState;
     private boolean currentState;
-    public Shooter (HardwareMap hardwareMap) {
+    private final MultipleTelemetry telemetry;
+    public Shooter (HardwareMap hardwareMap, MultipleTelemetry telemetry) {
         motorL = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorLid);
         motorR = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorRid);
 //        axisMotor = hardwareMap.get(ServoEx.class, Constants.axisServoId);
@@ -41,6 +41,7 @@ public class Shooter extends SubsystemBase {
         motorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorR.setDirection(DcMotorSimple.Direction.REVERSE);
         motorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.telemetry = telemetry;
 
     }
     public void setSetpoint(double desiredSetpoint) {
@@ -161,7 +162,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean justShotBall() {
-        lastState = currentState;
+        boolean lastState = currentState;
         currentState = getCurrent() < Configs.shooterConfigs.pollenCurrentThresh;
         return (lastState && !currentState);
     }
@@ -182,22 +183,23 @@ public class Shooter extends SubsystemBase {
         setPower(0);
     }
 
-    public void periodic(MultipleTelemetry telemetry) {
+    public void periodic(MultipleTelemetry telemetry, boolean toggle) {
+//        telemetry.setAutoClear(!toggle);
 //        setSetpoint(Configs.shooterConfigs.manualShooterVelocity);
-//        runShooterL(Configs.shooterConfigs.manualShooterVelocity);
+        runShooterL(Configs.shooterConfigs.manualShooterVelocity);
         runShooterR(Configs.shooterConfigs.manualShooterVelocity);
-//        telemetry.addData("Left Motor Power: ", getPower("sMotorL"));
-//        telemetry.addData("Right Motor Power: ", getPower("sMotorR"));
-//        telemetry.addData("Avg Motor Power: ", getPower());
-//        telemetry.addData("Left Motor Current: ", getCurrent("sMotorL"));
-//        telemetry.addData("Right Motor Current: ", getCurrent("sMotorR"));
-//        telemetry.addData("Avg Motor Current: ", getCurrent());
-//        telemetry.addData("Left Motor RPM: ", getLeftRPM());
-//        telemetry.addData("Avg Motor RPM: ", getRPM());
+//        this.telemetry.addData("Left Motor Power: ", getPower("sMotorL"));
+//        this.telemetry.addData("Right Motor Power: ", getPower("sMotorR"));
+//        this.telemetry.addData("Avg Motor Power: ", getPower());
+//        this.telemetry.addData("Left Motor Current: ", getCurrent("sMotorL"));
+//        this.telemetry.addData("Right Motor Current: ", getCurrent("sMotorR"));
+//        this.telemetry.addData("Avg Motor Current: ", getCurrent());
+        telemetry.addData("Left Motor RPM: ", getLeftRPM());
+        telemetry.addData("Avg Motor RPM: ", (getLeftRPM()+getRightRPM())/2);
         telemetry.addData("Right Motor RPM: ", getRightRPM());
         telemetry.addData("right at setpoint?", RatSetpoint());
-//        telemetry.addData("left at setpoint", LatSetpoint());
-//        telemetry.addData("manual Shooter speed: ", Configs.shooterConfigs.manualShooterSpeed);
+//        this.telemetry.addData("left at setpoint", LatSetpoint());
+//        this.telemetry.addData("manual Shooter speed: ", Configs.shooterConfigs.manualShooterSpeed);
 
 //        runShooterR(setpoint);
 //        setPower(Configs.shooterConfigs.manualShooterSpeed);
