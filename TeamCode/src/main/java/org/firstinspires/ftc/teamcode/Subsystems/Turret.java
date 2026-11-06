@@ -20,14 +20,13 @@ public class Turret {
         turretMotor = hardwareMap.get(DcMotorEx.class, Constants.turretConstants.turretMotorid);
 
         turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void turnLeft() {
-        turretMotor.setPower(0.1);
+        turretMotor.setPower(0.5);
     }
     public void turnRight() {
-        turretMotor.setPower(0.1);
+        turretMotor.setPower(0.5);
     }
 }
