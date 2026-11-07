@@ -87,36 +87,42 @@ public class Teleop extends LinearOpMode {
 
             gamepad.readButtons();
 
-            String Ball = "";
-            int totalCount = 0;
-            String[] Balls = new String[3];
-
-            if(s_coloursensor.red() > 80) {
-                Ball = "Red Nectar";
-                Balls[totalCount] = "Red";
-                totalCount++;
-            } else if(s_coloursensor.blue() > 80) {
-                Ball = "Blue Nectar";
-                Balls[totalCount] = "Blue";
-                totalCount++;
-            } else if(s_coloursensor.green() > 120) {
-                Ball = "Pollen";
-                Balls[totalCount] = "Pollen";
-                totalCount++;
+            if(yPressed == true) {
+                s_shooter.setPower();
+            } else if(yPressed == false) {
+                s_shooter.stopShooters();
             }
+//
+//            String Ball = "";
+//            int totalCount = 0;
+//            String[] Balls = new String[3];
 
-            yPressed = gamepad.isDown(GamepadKeys.Button.Y);
-            if(yPressed = true) {
-                totalCount = 0;
-                for (int i = 0; i < 5; i++) {
-                    Balls[i] = "null";
-                }
-            }
-            String order = Arrays.toString(Balls);
+//            if(s_coloursensor.red() > 80) {
+//                Ball = "Red Nectar";
+//                Balls[totalCount] = "Red";
+//                totalCount++;
+//            } else if(s_coloursensor.blue() > 80) {
+//                Ball = "Blue Nectar";
+//                Balls[totalCount] = "Blue";
+//                totalCount++;
+//            } else if(s_coloursensor.green() > 120) {
+//                Ball = "Pollen";
+//                Balls[totalCount] = "Pollen";
+//                totalCount++;
+//            }
 
-            telemetry.addData("Ball in Intake: ", Ball);
-            telemetry.addData("Total Objects Counted", totalCount);
-            telemetry.addData("Order of Balls", order);
+//            yPressed = gamepad.isDown(GamepadKeys.Button.Y);
+//            if(yPressed = true) {
+//                totalCount = 0;
+//                for (int i = 0; i < 5; i++) {
+//                    Balls[i] = "null";
+//                }
+//            }
+//            String order = Arrays.toString(Balls);
+//
+//            telemetry.addData("Ball in Intake: ", Ball);
+//            telemetry.addData("Total Objects Counted", totalCount);
+//            telemetry.addData("Order of Balls", order);
 
             if (xPressed) {
                 o_odometry.resetHeading();

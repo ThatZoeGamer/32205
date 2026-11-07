@@ -41,9 +41,9 @@ public class Shooter extends SubsystemBase {
                 Configs.shooterConfigs.shooterKv);
 
         motorL.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorR.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
     public void setSetpoint(double desiredSetpoint) {
@@ -60,9 +60,9 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public void setPower(double power) {
-        motorL.setPower(power);
-        motorR.setPower(power);
+    public void setPower() {
+        motorL.setPower(1);
+        motorR.setPower(1);
     }
     /**
      * @param motor "sMotorL" or "sMotorR".
@@ -182,7 +182,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public void stopShooters() {
-        setPower(0);
+        motorL.setPower(0);
+        motorR.setPower(0);
     }
 
     public void periodic(MultipleTelemetry telemetry) {
