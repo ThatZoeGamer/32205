@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 import java.util.Arrays;
 
@@ -41,6 +42,8 @@ public class Teleop extends LinearOpMode {
     Drivetrain s_drivetrain;
     Limelight s_limelight;
     Shooter s_shooter;
+
+    Turret s_turret;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
     double netIntakePower;
@@ -56,6 +59,7 @@ public class Teleop extends LinearOpMode {
         s_coloursensor = new ColourSensor(hardwareMap);
         s_intake = new Intake(hardwareMap);
         s_shooter = new Shooter(hardwareMap);
+        s_turret = new Turret(hardwareMap);
 
         waitForStart();
 
@@ -66,6 +70,10 @@ public class Teleop extends LinearOpMode {
             o_odometry.periodic(m_telemetry);
             s_shooter.periodic(m_telemetry);
             s_coloursensor.periodic(m_telemetry);
+            s_turret.periodic(m_telemetry);
+
+            s_turret.setTurretPosition(s_turret.getSetpoint());
+
             m_telemetry.update();
 
             s_drivetrain.drive(
@@ -87,11 +95,13 @@ public class Teleop extends LinearOpMode {
 
             gamepad.readButtons();
 
-            if(yPressed == true) {
+            while(lDpadPressed) {
                 s_shooter.setPower();
-            } else if(yPressed == false) {
+            }
+            while(lDpadPressed) {
                 s_shooter.stopShooters();
             }
+
 //
 //            String Ball = "";
 //            int totalCount = 0;

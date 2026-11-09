@@ -24,31 +24,29 @@ public class Turret extends SubsystemBase {
 
     private double desiredVelocity;
 
-    private double setpoint = 0.0;
     public Turret(HardwareMap hardwareMap) {
         turretMotor = hardwareMap.get(DcMotorEx.class, Constants.turretConstants.turretMotorid);
         turret = new PIDController(
                 Configs.turretConfigs.turretP,
                 Configs.turretConfigs.turretI,
                 Configs.turretConfigs.turretD);
-
-
+        turret.enableContinuousInput(-1, 1);
         turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     //PID Methods, setpoint stuff and currentposition
     public void setSetpoint(double desiredSetpoint) {
-        setpoint = desiredSetpoint;
+        Configs.turretConfigs.setpoint = desiredSetpoint;
     }
     public double getSetpoint() {
-        return setpoint;
+        return Configs.turretConfigs.setpoint;
     }
     public double getPosition() {
         return turretMotor.getCurrentPosition();
     }
     public boolean atSetpoint() {
-        return Math.abs(setpoint - getPosition()) <= Configs.turretConfigs.positionTolerance;
+        return Math.abs(Configs.turretConfigs.setpoint - getPosition()) <= Configs.turretConfigs.positionTolerance;
     }
 
     //TODO: Need to add a controller button to set setpoint to zero.
@@ -57,7 +55,7 @@ public class Turret extends SubsystemBase {
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        setpoint = 0.0;
+        Configs.turretConfigs.setpoint = 0.0;
     }
 
     //idk why I added this, thought we should stop a robot cause robot should be stopped :)
@@ -65,16 +63,44 @@ public class Turret extends SubsystemBase {
         turretMotor.setPower(0.0);
     }
 
+    public double getRobotTurretAngle() {
+        double rotations = getPosition()/(24*3.7*10.55);
+        return rotations * 360;
+    }
 
+    public double wrapAngle(double angleD) {
+        angleD = angleD % 360;
+
+        if(angleD > 180) {
+            angleD -= 360;
+        }
+        if(angleD < -180) {
+            angleD += 360;
+        }
+        return angleD;
+    }
+
+    public void setTurretPosition(double desiredAngle) {
+        if(!atSetpoint()) {
+            turretMotor.setPower(wrapAngle(turret.calculate(getRobotTurretAngle(), desiredAngle)));
+        } else {
+            stopTurret();
+        }
+    }
+
+    public void stopTurret() {
+        turretMotor.setPower(0);
+    }
 
     public void periodic(MultipleTelemetry telemetry) {
         //Calculating where the turret is currently positioned and turning the Turret to a desired setPoint.
-        double currentPosition = turretMotor.getCurrentPosition();
-        double power = turret.calculate(currentPosition, setpoint);
-        power = Math.max(-Configs.turretConfigs.maxSpeed, Math.min(Configs.turretConfigs.maxSpeed, power));
-        turretMotor.setPower(power);
+//        int power = turret.calculate(currentPosition, Configs.turretConfigs.setpoint);
+//        power = Math.max(-Configs.turretConfigs.maxSpeed, Math.min(Configs.turretConfigs.maxSpeed, power));
+//        turretMotor.setTargetPosition((int) turret.calculate(currentPosition, getSetpoint()));
+
         //Telemetry
         telemetry.addData("At setpoint?", atSetpoint());
+        telemetry.addData("Current Position", turretMotor.getCurrentPosition());
     }
 
 

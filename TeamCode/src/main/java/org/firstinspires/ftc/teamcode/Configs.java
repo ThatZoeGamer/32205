@@ -15,6 +15,8 @@ public class Configs {
 
         public static double turretD = 0;
 
+        public static double setpoint = 0.0;
+
         public static double maxSpeed = 1;
 
         public static double positionTolerance = 10.0;
