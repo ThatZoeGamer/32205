@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
@@ -38,6 +39,8 @@ public class Teleop extends LinearOpMode {
     Shooter s_shooter;
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
+    Turret s_turret;
+    double netIntakePower;
 
     @Override
     public void runOpMode() {
@@ -67,6 +70,30 @@ public class Teleop extends LinearOpMode {
 
             s_intake.runIntake(gamepad);
 
+            aPressed = gamepad.isDown(GamepadKeys.Button.A);
+            xPressed = gamepad.isDown(GamepadKeys.Button.X);
+            yPressed = gamepad.isDown(GamepadKeys.Button.Y);
+            lDpadPressed = gamepad.wasJustPressed(GamepadKeys.Button.DPAD_LEFT);
+            rDpadPressed = gamepad.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT);
+            lbPressed = gamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
+            rbPressed = gamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
+
+            gamepad.readButtons();
+
+            if(lDpadPressed) {
+                s_turret.turnLeft();
+            } else if(rDpadPressed) {
+                s_turret.turnRight();
+            }
+
+            if (xPressed) {
+                o_odometry.resetHeading();
+            }
+
+            if (aPressed) {
+                o_odometry.resetPosition();
+            }
+        }
             if (xPressed) {o_odometry.resetHeading();}
 
             if (aPressed) {o_odometry.resetPosition();}
