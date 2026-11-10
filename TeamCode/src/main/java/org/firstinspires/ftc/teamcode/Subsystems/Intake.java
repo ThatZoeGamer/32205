@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
 
     public Intake(HardwareMap hardwaremap, MultipleTelemetry telemetry) {
         intakeMotor = hardwaremap.get(DcMotorEx.class, Constants.intakeConstants.intakeMotorId);
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.telemetry = telemetry;
     }
@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase {
         if(gamepad.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
             intakeMotor.setPower(-gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
         } else {
-            intakeMotor.setPower(-gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
+            intakeMotor.setPower(gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
         }
     }
 

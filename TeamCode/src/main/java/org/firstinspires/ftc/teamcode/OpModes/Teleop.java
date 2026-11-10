@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.teamcode.Configs;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -55,31 +56,30 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
             globalPeriodic();
-            m_telemetry.update();
 
+            gamepad.readButtons();
 
             s_drivetrain.drive(
-                    gamepad.getLeftY(),
-                    -gamepad.getLeftX(),
-                    gamepad.getRightX()
+                    -gamepad.getLeftY(),
+                    gamepad.getLeftX(),
+                    -gamepad.getRightX()
             );
 
             s_intake.runIntake(gamepad);
 
-            gamepad.readButtons();
-
             if (xPressed) {o_odometry.resetHeading();}
 
             if (aPressed) {o_odometry.resetPosition();}
+            m_telemetry.update();
         }
     }
     public void globalPeriodic() {
-        s_drivetrain.periodic(m_telemetry);
+//        s_drivetrain.periodic(m_telemetry);
 //        s_limelight.periodic(m_telemetry, Configs.toggles.limelightTelemetry);
-        s_intake.periodic(m_telemetry, Configs.toggles.intakeTelemetry);
-        o_odometry.periodic(m_telemetry, Configs.toggles.odomTelemetry);
-        s_shooter.periodic(m_telemetry, Configs.toggles.shooterTelemetry);
-        s_coloursensor.periodic(m_telemetry, Configs.toggles.colourSensorTelemetry);
+//        s_intake.periodic(m_telemetry, Configs.toggles.intakeTelemetry);
+//        o_odometry.periodic(m_telemetry, Configs.toggles.odomTelemetry);
+        s_shooter.periodic(m_telemetry, Configs.shooterConfigs.manualShooterVelocity);
+//        s_coloursensor.periodic(m_telemetry, Configs.toggles.colourSensorTelemetry);
     }
 
     public void initButtons() {

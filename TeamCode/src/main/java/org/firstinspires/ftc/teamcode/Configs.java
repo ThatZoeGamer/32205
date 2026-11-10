@@ -19,16 +19,16 @@ public class Configs {
     }
     @Config
     public static final class shooterConfigs {
-        public static double shooterP = 0.001;
+        public static double shooterP = 0.01;
         public static double shooterI = 0;
         public static double shooterD = 0;
-        public static double shooterKs = 0.000;
-        public static  double shooterKv = 0.000;
+        public static double shooterKs = 0.00001;
+        public static  double shooterKv = 0.00001;
         public static double shooterSetpointTol = 10;
-        public static double maxSpeed = 1;
-//        public static double manuelLeftVelocity = 0.25;
-//        public static double manuelRightVelocity = 0.25;
-        public static double manualShooterVelocity = 0.25;
+        public static double maxSpeed = 1000;
+        public static double manuelLeftVelocity = 1;
+        public static double manuelRightVelocity = 1;
+        public static double manualShooterVelocity = 0.0;
         public static double baseCurrent = 3.7;
         public static double pollenCurrentThresh = 10;
         public static double nectarCurrentThresh = 10;
