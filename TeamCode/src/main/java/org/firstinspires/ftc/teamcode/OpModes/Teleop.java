@@ -72,7 +72,6 @@ public class Teleop extends LinearOpMode {
             s_coloursensor.periodic(m_telemetry);
             s_turret.periodic(m_telemetry);
 
-            s_turret.setTurretPosition(s_turret.getSetpoint());
 
             m_telemetry.update();
 
@@ -93,14 +92,14 @@ public class Teleop extends LinearOpMode {
             lbPressed = gamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
             rbPressed = gamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
 
-            gamepad.readButtons();
+            if (lDpadPressed) {
+                s_turret.setSetpoint(s_turret.getSetpoint() - 5);
+            }
+            if (rDpadPressed) {
+                s_turret.setSetpoint(s_turret.getSetpoint() + 5);
+            }
 
-            while(lDpadPressed) {
-                s_shooter.setPower();
-            }
-            while(lDpadPressed) {
-                s_shooter.stopShooters();
-            }
+            gamepad.readButtons();
 
 //
 //            String Ball = "";

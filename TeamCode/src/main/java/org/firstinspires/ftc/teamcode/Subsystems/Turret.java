@@ -30,10 +30,9 @@ public class Turret extends SubsystemBase {
                 Configs.turretConfigs.turretP,
                 Configs.turretConfigs.turretI,
                 Configs.turretConfigs.turretD);
-        turret.enableContinuousInput(-1, 1);
+        turret.enableContinuousInput(-180, 180);
         turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     //PID Methods, setpoint stuff and currentposition
     public void setSetpoint(double desiredSetpoint) {
@@ -46,7 +45,7 @@ public class Turret extends SubsystemBase {
         return turretMotor.getCurrentPosition();
     }
     public boolean atSetpoint() {
-        return Math.abs(Configs.turretConfigs.setpoint - getPosition()) <= Configs.turretConfigs.positionTolerance;
+        return Math.abs(Configs.turretConfigs.setpoint - getRobotTurretAngle()) <= Configs.turretConfigs.positionTolerance;
     }
 
     //TODO: Need to add a controller button to set setpoint to zero.
@@ -68,24 +67,29 @@ public class Turret extends SubsystemBase {
         return rotations * 360;
     }
 
-    public double wrapAngle(double angleD) {
-        angleD = angleD % 360;
-
-        if(angleD > 180) {
-            angleD -= 360;
-        }
-        if(angleD < -180) {
-            angleD += 360;
-        }
-        return angleD;
-    }
+//    public double wrapAngle(double angleD) {
+//        angleD = angleD % 360;
+//
+//        if(angleD > 180) {
+//            angleD -= 360;
+//        }
+//        if(angleD < -180) {
+//            angleD += 360;
+//        }
+//        return angleD;
+//    }
 
     public void setTurretPosition(double desiredAngle) {
         if(!atSetpoint()) {
-            turretMotor.setPower(wrapAngle(turret.calculate(getRobotTurretAngle(), desiredAngle)));
+            double power = turret.calculate(getRobotTurretAngle(), desiredAngle);
+            turretMotor.setPower(power);
         } else {
             stopTurret();
         }
+    }
+
+    public void justSetPower() {
+        turretMotor.setPower(0.3);
     }
 
     public void stopTurret() {
@@ -101,6 +105,8 @@ public class Turret extends SubsystemBase {
         //Telemetry
         telemetry.addData("At setpoint?", atSetpoint());
         telemetry.addData("Current Position", turretMotor.getCurrentPosition());
+        telemetry.addData("SetPoint", getSetpoint());
+        telemetry.addData("Turret Angle", getRobotTurretAngle());
     }
 
 
