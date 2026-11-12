@@ -84,6 +84,8 @@ public class Teleop extends LinearOpMode {
                 s_turret.turnLeft();
             } else if(rDpadPressed) {
                 s_turret.turnRight();
+            } else {
+                s_turret.zero();
             }
 
             if (xPressed) {

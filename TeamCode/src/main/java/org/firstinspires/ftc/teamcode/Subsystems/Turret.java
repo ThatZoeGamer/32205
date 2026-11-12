@@ -29,4 +29,7 @@ public class Turret {
     public void turnRight() {
         turretMotor.setPower(0.5);
     }
+    public void zero() {
+        turretMotor.setPower(0);
+    }
 }
