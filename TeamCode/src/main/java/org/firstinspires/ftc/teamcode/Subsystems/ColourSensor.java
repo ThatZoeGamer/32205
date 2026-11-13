@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import android.app.Activity;
 import android.view.View;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -41,12 +42,11 @@ public class ColourSensor extends SubsystemBase {
     public int blue() {
         return colourSensor.blue();
     }
-    public void periodic(MultipleTelemetry telemetry, boolean toggle) {
-//        this.telemetry.setAutoClear(!toggle);
-        telemetry.addData("LED Enabled:", bLedOn ? "True" : "False");
-        telemetry.addData("Clear:", alpha());
-        telemetry.addData("Red:  ", red());
-        telemetry.addData("Green:", green());
-        telemetry.addData("Blue: ", blue());
+    public void periodic(MultipleTelemetry telemetry) {
+            telemetry.addData("LED Enabled:", bLedOn ? "True" : "False");
+            telemetry.addData("Clear:", alpha());
+            telemetry.addData("Red:  ", red());
+            telemetry.addData("Green:", green());
+            telemetry.addData("Blue: ", blue());
     }
 }

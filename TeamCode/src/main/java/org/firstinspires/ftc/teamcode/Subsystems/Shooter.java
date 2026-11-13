@@ -28,6 +28,7 @@ public class Shooter extends SubsystemBase {
     private double Lsetpoint;
     private double Rsetpoint;
     private double currentVelocity;
+    private boolean lastState;
     private boolean currentState;
     private final MultipleTelemetry telemetry;
     public Shooter (HardwareMap hardwareMap, MultipleTelemetry telemetry) {
@@ -87,7 +88,29 @@ public class Shooter extends SubsystemBase {
     public DcMotorEx getRightMotor() {
         return motorR;
     }
+    /**
+     * @return average power of both motors
+     */
+    public double getPower() {
+        return (motorL.getPower()+ motorR.getPower())/2;
+    }
+//    /**
+//     * @param motor "sMotorL" or "sMotorR"
+//     * @return RPM of inputted motor
+//     */
+//    public double getRPM(String motor) {
+//        if(motor.equals(motorL.getDeviceName())) {
+//            return (getVelocity(motor)/Constants.shooterConstants.ticksPerRev*60);
+//        } else if (motor.equals(motorR.getDeviceName())) {
+//            return (getVelocity(motor)/Constants.shooterConstants.ticksPerRev*60);
+//        } else {
+//            return 500;
+//        }
+//    }
 
+    /**
+     * @return avg RPM of both motors
+     */
     public double getRightRPM() {
         double motorRPM = ((motorR.getVelocity()/Constants.shooterConstants.ticksPerRev)*60);
         return motorRPM / Constants.shooterConstants.gearRatio;
@@ -119,6 +142,23 @@ public class Shooter extends SubsystemBase {
 //                + LshooterFF.calculate(motorL.getVelocity(), desiredVelocity);
 //        motorL.setPower(Math.max(Math.min(dv, Configs.shooterConfigs.maxSpeed), 0));
     }
+    /**
+     *
+     * @param motor "sMotorL" or "sMotorR"
+     * @return Current of inputted motor
+     */
+    public double getCurrent(String motor) {
+        if (motor.equals(motorL.getDeviceName())) {
+            return motorL.getCurrent(CurrentUnit.AMPS);
+        } else if (motor.equals(motorR.getDeviceName())) {
+            return motorR.getCurrent(CurrentUnit.AMPS);
+        } else {
+            return 6767;
+        }
+    }
+    /**
+     * @return Avg current of both motors
+     */
     public double getCurrent() {
         return (motorL.getCurrent(CurrentUnit.AMPS) + motorR.getCurrent(CurrentUnit.AMPS))/2;
     }
@@ -162,4 +202,5 @@ public class Shooter extends SubsystemBase {
         telemetry.addData("rpm R", getRightRPM());
 
     }
+
 }

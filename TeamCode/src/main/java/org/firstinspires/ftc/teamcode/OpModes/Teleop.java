@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.Vision.GPE;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
