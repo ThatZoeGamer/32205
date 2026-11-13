@@ -34,6 +34,11 @@ public class Drivetrain extends SubsystemBase {
         backLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backLeftMotor);
         backRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backRightMotor);
         odom = new Odometry(hardwaremap, telemetry);
+//        DcMotor.ZeroPowerBehavior
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);

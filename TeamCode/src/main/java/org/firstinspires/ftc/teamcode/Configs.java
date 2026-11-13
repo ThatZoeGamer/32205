@@ -19,11 +19,16 @@ public class Configs {
     }
     @Config
     public static final class shooterConfigs {
-        public static double shooterP = 0.01;
-        public static double shooterI = 0;
-        public static double shooterD = 0;
-        public static double shooterKs = 0.00001;
-        public static  double shooterKv = 0.00001;
+        public static double LshooterP = 0.01;
+        public static double LshooterI = 0;
+        public static double LshooterD = 0.0;
+        public static double RshooterP = 0.01;
+        public static double RshooterI = 0;
+        public static double RshooterD = 0;
+        public static double LshooterKs = 0.000001;
+        public static  double LshooterKv = 0.000019;
+        public static double RshooterKs = 0.000005;
+        public static  double RshooterKv = 0.000019;
         public static double shooterSetpointTol = 10;
         public static double maxSpeed = 1000;
         public static double manuelLeftVelocity = 1;

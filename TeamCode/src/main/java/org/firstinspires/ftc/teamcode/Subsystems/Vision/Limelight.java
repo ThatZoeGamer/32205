@@ -9,10 +9,11 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Configs;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
-import org.firstinspires.ftc.teamcode.Utilities.LimitedQueue;
+//import org.firstinspires.ftc.teamcode.Utilities.LimitedQueue;
 
 import java.util.List;
 
@@ -21,16 +22,17 @@ import java.util.List;
 public class Limelight {
     private int[] desiredTagID;
     public LLResultTypes.FiducialResult desiredTag;
-    public LimitedQueue<Double> fifo;
     private final Limelight3A limelight;
-    private final MultipleTelemetry telemetry;
     public boolean targetFound;
     public static double tY;
     public static double tX;
+    public static double roll;
+    public static double yaw;
+    public static double pitch;
+    public static Pose3D botPose;
     public Limelight(HardwareMap hardwareMap, MultipleTelemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        this.telemetry = telemetry;
-        this.telemetry.setMsTransmissionInterval(11);
+        telemetry.setMsTransmissionInterval(11);
         if(blueTeam) {
             limelight.pipelineSwitch(0);
         } else {
@@ -53,36 +55,50 @@ public class Limelight {
     }
     public void getAprilTagData(MultipleTelemetry m_telemetry) {
         targetFound = false;
+//        tX = 0;
+//        tY = 0;
+//        roll = 0;
+//        pitch = 0;
+//        yaw = 0;
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                m_telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f",
-                        fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-                refreshDesiredID();
-                m_telemetry.addData("CORRECT TAG ID?", checkDesiredTagID(fr.getFiducialId()));
+//                m_telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+//                        fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+//                refreshDesiredID();
+//                m_telemetry.addData("CORRECT TAG ID?", checkDesiredTagID(fr.getFiducialId()));
                 if (checkDesiredTagID(fr.getFiducialId())) {
                     targetFound = true;
                     desiredTag = fr;
                     tX = fr.getTargetXDegrees();
                     tY = fr.getTargetYDegrees();
+                    botPose = result.getBotpose();
+                    pitch = botPose.getOrientation().getPitch();
+                    roll = botPose.getOrientation().getRoll();
+                    yaw = botPose.getOrientation().getYaw();
                 } else {
                     m_telemetry.addData("Skipping", "Tag ID %d is not desired", fr.getFiducialId());
                 }
             }
         }
     }
-    public double getTargetRange() {
-        double angleToGoalRadians = Math.toRadians(20 + getTy());
-        return (29.5 - 14.491)/(Math.tan(angleToGoalRadians));
-    }
 
-    public double getRangeAvg() {
-        double totalvalue = 0;
-        for (int i = 0; i < fifo.size(); i++) {
-            totalvalue += fifo.get(i);
-        }
-        return totalvalue/fifo.size();
+    public double getTargetRange() {
+        double angleToGoalRadians = Math.toRadians(65 + tY);
+        return (50 - 11)/(Math.tan(angleToGoalRadians));
+    }
+    public double getYaw() {
+        return yaw;
+    }
+    public double getPitch() {
+        return pitch;
+    }
+    public double getRoll() {
+        return roll;
+    }
+    public Pose3D getBotPose() {
+        return botPose;
     }
     public boolean foundTarget() {
         return targetFound;
@@ -96,10 +112,8 @@ public class Limelight {
         return tY;
     }
 
-    public void periodic(MultipleTelemetry telemetry, boolean toggle) {
-//        this.telemetry.setAutoClear(!toggle);
+    public void periodic(MultipleTelemetry telemetry) {
         refreshDesiredID();
-        fifo.add(getTargetRange());
 
         LLStatus status = limelight.getStatus();
         telemetry.addData("Name", "%s",
@@ -109,9 +123,10 @@ public class Limelight {
         telemetry.addData("Pipeline", "Index: %d, Type: %s",
                 status.getPipelineIndex(), status.getPipelineType());
         telemetry.addData("targetFound", foundTarget());
-        getAprilTagData(this.telemetry);
-
-        telemetry.addData("TARGET RANGE AVG:", getRangeAvg());
-        telemetry.addData("result", limelight.getLatestResult());
+        getAprilTagData(telemetry);
+        tX = limelight.getLatestResult().getTx();
+        tY = limelight.getLatestResult().getTy();
+        botPose = limelight.getLatestResult().getBotpose();
+        yaw = botPose.getOrientation().getYaw();
     }
 }

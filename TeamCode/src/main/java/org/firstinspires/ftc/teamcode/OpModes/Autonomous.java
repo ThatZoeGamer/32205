@@ -20,13 +20,13 @@ public class Autonomous extends LinearOpMode {
 
         gamepad = new GamepadEx(gamepad1);
 
-        s_drivetrain = new Drivetrain(hardwareMap);
+//        s_drivetrain = new Drivetrain(hardwareMap);
 
         waitForStart();
 
         while (opModeIsActive()) {
 
-            s_drivetrain.runMoter();
+//            s_drivetrain.runMoter();
 
 //            s_drivetrain.drive(
 //                    gamepad.getLeftY(),
@@ -43,7 +43,7 @@ public class Autonomous extends LinearOpMode {
                 s_drivetrain.resetYaw();
             }
 
-            s_drivetrain.periodic(telemetry);
+//            s_drivetrain.periodic(telemetry);
             telemetry.addData("A button: ", aPressed);
             telemetry.update();
         }
