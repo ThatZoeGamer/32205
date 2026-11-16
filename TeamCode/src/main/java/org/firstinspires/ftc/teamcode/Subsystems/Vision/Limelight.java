@@ -16,9 +16,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 //import org.firstinspires.ftc.teamcode.Utilities.LimitedQueue;
 
 import java.util.List;
-
-
-
 public class Limelight {
     private int[] desiredTagID;
     public LLResultTypes.FiducialResult desiredTag;
@@ -55,11 +52,6 @@ public class Limelight {
     }
     public void getAprilTagData(MultipleTelemetry m_telemetry) {
         targetFound = false;
-//        tX = 0;
-//        tY = 0;
-//        roll = 0;
-//        pitch = 0;
-//        yaw = 0;
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
