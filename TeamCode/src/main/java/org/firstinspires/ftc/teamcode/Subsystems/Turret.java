@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.Configs;
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Configs.TurretConfigs;
+import org.firstinspires.ftc.teamcode.Constants.TurretConstants;
 import org.firstinspires.ftc.teamcode.Utilities.PIDController;
 
 //TODO: Gonna add Limelight apriltag detection for the turret to turn the turret in the correct direction.
@@ -21,41 +19,35 @@ public class Turret extends SubsystemBase {
     //Initialization BS
     private final PIDController turret;
     private final DcMotorEx turretMotor;
-    private final MultipleTelemetry m_telemtry;
-
     private double desiredVelocity;
 
     public Turret(HardwareMap hardwareMap) {
-        turretMotor = hardwareMap.get(DcMotorEx.class, Constants.turretConstants.turretMotorid);
+        turretMotor = hardwareMap.get(DcMotorEx.class, TurretConstants.turretMotorId);
         turret = new PIDController(
-                Configs.turretConfigs.turretP,
-                Configs.turretConfigs.turretI,
-                Configs.turretConfigs.turretD);
-        turret.enableContinuousInput(-180, 180);
+                TurretConfigs.turretP,
+                TurretConfigs.turretI,
+                TurretConfigs.turretD);
         turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    //PID Methods, setpoint stuff and currentposition
+
     public void setSetpoint(double desiredSetpoint) {
-        Configs.turretConfigs.setpoint = desiredSetpoint;
+        TurretConfigs.setpoint = Math.max(Math.min(desiredSetpoint, TurretConstants.maxAngle), TurretConstants.minAngle);
     }
     public double getSetpoint() {
-        return Configs.turretConfigs.setpoint;
+        return TurretConfigs.setpoint;
     }
     public double getPosition() {
         return turretMotor.getCurrentPosition();
     }
     public boolean atSetpoint() {
-        return Math.abs(Configs.turretConfigs.setpoint - getRobotTurretAngle()) <= Configs.turretConfigs.positionTolerance;
+        return Math.abs(TurretConfigs.setpoint - getRobotTurretAngle()) <= TurretConfigs.positionTolerance;
     }
 
-    //TODO: Need to add a controller button to set setpoint to zero.
-    //TODO: Unless there is a button we can use for all zeroing???
     public void zero() {
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        Configs.turretConfigs.setpoint = 0.0;
+        TurretConfigs.setpoint = 0.0;
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     //idk why I added this, thought we should stop a robot cause robot should be stopped :)
@@ -64,7 +56,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getRobotTurretAngle() {
-        double rotations = getPosition()/(24*3.7*10.55);
+        double rotations = getPosition()/(24*3.7*13.57);
         return rotations * 360;
     }
 
@@ -98,16 +90,18 @@ public class Turret extends SubsystemBase {
     }
 
     public void periodic(MultipleTelemetry telemetry) {
-        //Calculating where the turret is currently positioned and turning the Turret to a desired setPoint.
 //        int power = turret.calculate(currentPosition, Configs.turretConfigs.setpoint);
 //        power = Math.max(-Configs.turretConfigs.maxSpeed, Math.min(Configs.turretConfigs.maxSpeed, power));
 //        turretMotor.setTargetPosition((int) turret.calculate(currentPosition, getSetpoint()));
-
-        //Telemetry
-        telemetry.addData("At setpoint?", atSetpoint());
-        telemetry.addData("Current Position", turretMotor.getCurrentPosition());
-        telemetry.addData("SetPoint", getSetpoint());
-        telemetry.addData("Turret Angle", getRobotTurretAngle());
+        setTurretPosition(getSetpoint());
+        if(telemetry != null) {
+            telemetry.addData("T :----------TURRET----------", "T");
+            telemetry.addData("T: At setpoint?", atSetpoint());
+            telemetry.addData("T: Current Position", turretMotor.getCurrentPosition());
+            telemetry.addData("T: SetPoint", getSetpoint());
+            telemetry.addData("T: Power Turret", turretMotor.getPower());
+            telemetry.addData("T: Turret Angle", getRobotTurretAngle());
+        }
     }
 
 

@@ -26,9 +26,9 @@ public class test extends LinearOpMode{
 
     @Override
     public void runOpMode() {
-        gamepad = new GamepadEx(gamepad1);
-        m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        s_shooter = new Shooter(hardwareMap, m_telemetry);
+//        gamepad = new GamepadEx(gamepad1);
+//        m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+//        s_shooter = new Shooter(hardwareMap, m_telemetry, vs);
 //        s_shooter.getLeftMotor().getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         waitForStart();
         while (opModeIsActive()) {

@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Vision;
 
-import static org.firstinspires.ftc.teamcode.Configs.toggles.blueTeam;
+import static org.firstinspires.ftc.teamcode.Configs.Toggles.blueTeam;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -111,18 +111,12 @@ public class Limelight {
     public double getTy() {
         return tY;
     }
-
     public void periodic(MultipleTelemetry telemetry) {
         refreshDesiredID();
-
         LLStatus status = limelight.getStatus();
-        telemetry.addData("Name", "%s",
-                status.getName());
-        telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-                status.getTemp(), status.getCpu(),(int)status.getFps());
-        telemetry.addData("Pipeline", "Index: %d, Type: %s",
-                status.getPipelineIndex(), status.getPipelineType());
-        telemetry.addData("targetFound", foundTarget());
+        telemetry.addData("LI :----------LIMELIGHT----------", "LI");
+        telemetry.addData("LI: Pipeline", "Index: %d, Type: %s", status.getPipelineIndex(), status.getPipelineType());
+        telemetry.addData("LI: TargetFound", foundTarget());
         getAprilTagData(telemetry);
         tX = limelight.getLatestResult().getTx();
         tY = limelight.getLatestResult().getTy();

@@ -5,19 +5,20 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Odometry extends SubsystemBase {
     GoBildaPinpointDriver pinpoint;
-    private final MultipleTelemetry telemetry;
-    public Odometry (HardwareMap hardwareMap, MultipleTelemetry telemetry){
+
+    public Odometry (HardwareMap hardwareMap){
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         configurePinpoint();
         resetPosition();
-        this.telemetry = telemetry;
     }
     public void resetPosition() {
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0 ,0, AngleUnit.DEGREES, getPinHeading()));
@@ -35,14 +36,18 @@ public class Odometry extends SubsystemBase {
         return pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
     }
 
-    public void periodic(MultipleTelemetry telemetry, boolean toggle) {
-//        this.telemetry.setAutoClear(!toggle);
-        Pose2D pose2D = pinpoint.getPosition();
-        telemetry.addData("X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
-        telemetry.addData("Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
-        telemetry.addData(" Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
+    public void periodic(MultipleTelemetry telemetry) {
         pinpoint.update();
+        Pose2D pose2D = pinpoint.getPosition();
+
+        if (telemetry != null) {
+            telemetry.addData("O :----------ODOMETRY----------", "O");
+            telemetry.addData("O: X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
+            telemetry.addData("O: Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
+            telemetry.addData("O: Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
+        }
     }
+
 
 
     public void configurePinpoint(){

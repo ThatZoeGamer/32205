@@ -1,4 +1,5 @@
 repositories {
+//    maven { url = "https://maven.rowanmcalpin.com/" }
     maven { url = 'https://maven.brott.dev/' }
     maven {url = "https://mymaven.bylazar.com/releases"}
     mavenCentral()
@@ -6,6 +7,8 @@ repositories {
 }
 
 dependencies {
+//    implementation 'com.rowanmcalpin.nextftc:core:0.6.2'
+//    implementation 'com.rowanmcalpin.nextftc:ftc:0.6.2'
     implementation 'org.firstinspires.ftc:Inspection:12.0.0'
     implementation 'org.firstinspires.ftc:Blocks:12.0.0'
     implementation 'org.firstinspires.ftc:RobotCore:12.0.0'

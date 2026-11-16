@@ -28,12 +28,12 @@ public class Drivetrain extends SubsystemBase {
     private final Odometry odom;
     private double yawOffset;
 
-    public Drivetrain(HardwareMap hardwaremap, MultipleTelemetry telemetry) {
+    public Drivetrain(HardwareMap hardwaremap) {
         frontLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontLeftMotor);
         frontRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.frontRightMotor);
         backLeft = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backLeftMotor);
         backRight = hardwaremap.get(DcMotor.class, Constants.DrivetrainConstants.backRightMotor);
-        odom = new Odometry(hardwaremap, telemetry);
+        odom = new Odometry(hardwaremap);
 //        DcMotor.ZeroPowerBehavior
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

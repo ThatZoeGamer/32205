@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
-import android.app.Activity;
-import android.view.View;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ColourSensor extends SubsystemBase {
 
     public boolean bLedOn = true;
     ColorSensor colourSensor;    // Hardware Device Object
-    private final MultipleTelemetry telemetry;
+    private boolean currentState;
+    private char detectedColour = 'n';
+    private final Map<String, Object> csTelemetry = new LinkedHashMap<>();
 
-    public ColourSensor(HardwareMap hardwareMap, MultipleTelemetry telemetry) {
+    public ColourSensor(HardwareMap hardwareMap) {
 
         boolean bPrevState = false;
         boolean bCurrState = false;
@@ -28,7 +28,6 @@ public class ColourSensor extends SubsystemBase {
 //        final View relativeLayout = ((Activity) BlocksOpModeCompanion.hardwareMap.appContext).findViewById(relativeLayoutId);
 
         colourSensor = hardwareMap.get(ColorSensor.class, "colourSensor");
-        this.telemetry = telemetry;
     }
 
     public void bLedOn() { colourSensor.enableLed(bLedOn); }
@@ -39,14 +38,35 @@ public class ColourSensor extends SubsystemBase {
     public int green() {
         return colourSensor.green();
     }
-    public int blue() {
-        return colourSensor.blue();
+    public int blue() {return colourSensor.blue();}
+    public boolean newBall() {
+        boolean lastState = currentState;
+        currentState = red() > 80 || blue() > 80 || green() > 120;
+
+        if (currentState) {
+            if (red() > 80) {
+                detectedColour = 'R';
+            } else if (blue() > 80) {
+                detectedColour = 'B';
+            } else if (green() > 120) {
+                detectedColour = 'P';
+            }
+        }
+
+        return (lastState && !currentState);
     }
+    public char lastBall() {
+        return detectedColour;
+    }
+
     public void periodic(MultipleTelemetry telemetry) {
-            telemetry.addData("LED Enabled:", bLedOn ? "True" : "False");
-            telemetry.addData("Clear:", alpha());
-            telemetry.addData("Red:  ", red());
-            telemetry.addData("Green:", green());
-            telemetry.addData("Blue: ", blue());
+        if (telemetry != null) {
+            telemetry.addData("CS :----------COLOUR SENSOR----------", "CS");
+            telemetry.addData("CS: LED Enabled:", bLedOn ? "True" : "False");
+            telemetry.addData("CS: Clear:", alpha());
+            telemetry.addData("CS: Red:  ", red());
+            telemetry.addData("CS: Green:", green());
+            telemetry.addData("CS: Blue: ", blue());
+        }
     }
 }

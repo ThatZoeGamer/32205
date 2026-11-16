@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.Configs;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Transmission;
+import org.firstinspires.ftc.teamcode.Subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.GPE;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
@@ -43,32 +44,34 @@ public class Teleop extends LinearOpMode {
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
     Turret s_turret;
-    Transmission s_transmission;
+    Transfer s_transfer;
     GPE s_GPE;
-    double netIntakePower;
+    VoltageSensor vs;
 
     @Override
     public void runOpMode() {
+        vs = hardwareMap.voltageSensor.iterator().next();
         gamepad = new GamepadEx(gamepad1);
 
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        s_drivetrain = new Drivetrain(hardwareMap, m_telemetry);
-        o_odometry = new Odometry(hardwareMap, m_telemetry);
+
+        s_drivetrain = new Drivetrain(hardwareMap);
+        o_odometry = new Odometry(hardwareMap);
         s_limelight = new Limelight(hardwareMap, m_telemetry);
-        s_coloursensor = new ColourSensor(hardwareMap, m_telemetry);
-        s_intake = new Intake(hardwareMap, m_telemetry);
-        s_shooter = new Shooter(hardwareMap, m_telemetry);
-        s_turret = new Turret(hardwareMap, m_telemetry);
-        s_GPE = new GPE(m_telemetry, s_limelight, o_odometry);
-        s_transmission = new Transmission(hardwareMap);
+        s_coloursensor = new ColourSensor(hardwareMap);
+        s_intake = new Intake(hardwareMap);
+        s_shooter = new Shooter(hardwareMap, vs);
+        s_turret = new Turret(hardwareMap);
+        s_GPE = new GPE(s_limelight, o_odometry);
+        s_transfer = new Transfer(hardwareMap);
+
+        s_turret.zero();
 
         waitForStart();
 
         while (opModeIsActive()) {
             globalPeriodic();
             initButtons();
-
-            gamepad.readButtons();
 
             s_drivetrain.drive(
                     -gamepad.getLeftY(),
@@ -77,34 +80,30 @@ public class Teleop extends LinearOpMode {
             );
 
             s_intake.runIntake(gamepad);
-            s_transmission.transfer(gamepad);
+            s_transfer.transfer(gamepad);
+            s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+            s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+            s_turret.setSetpoint(Configs.TurretConfigs.setpoint);
 
-            gamepad.readButtons();
+            if (uDpadPressed) {o_odometry.resetHeading();}
 
-//            if(lDpadPressed) {
-//                s_turret.turnLeft();
-//            } else if(rDpadPressed) {
-//                s_turret.turnRight();
-//            } else {
-//                s_turret.zero();
-//            }
+            if (dDpadPressed) {o_odometry.resetPosition();}
         }
-        if (uDpadPressed) {o_odometry.resetHeading();}
-
-        if (dDpadPressed) {o_odometry.resetPosition();}
     }
     public void globalPeriodic() {
-//        s_drivetrain.periodic(m_telemetry);
+        s_drivetrain.periodic(m_telemetry);
         s_limelight.periodic(m_telemetry);
         s_GPE.periodic(m_telemetry);
-//        s_intake.periodic(m_telemetry, Configs.toggles.intakeTelemetry);
-//        s_shooter.periodic(m_telemetry, Configs.shooterConfigs.manualShooterVelocity);
-//        s_coloursensor.periodic(m_telemetry, Configs.toggles.colourSensorTelemetry);
-        o_odometry.periodic(m_telemetry, Configs.toggles.odomTelemetry);
+        s_turret.periodic(m_telemetry);
+        s_intake.periodic(m_telemetry);
+        s_shooter.periodic(m_telemetry);
+        s_coloursensor.periodic(m_telemetry);
+        o_odometry.periodic(m_telemetry);
         m_telemetry.update();
     }
 
     public void initButtons() {
+        gamepad.readButtons();
         aPressed = gamepad.isDown(GamepadKeys.Button.A);
         xPressed = gamepad.isDown(GamepadKeys.Button.X);
         yPressed = gamepad.isDown(GamepadKeys.Button.Y);

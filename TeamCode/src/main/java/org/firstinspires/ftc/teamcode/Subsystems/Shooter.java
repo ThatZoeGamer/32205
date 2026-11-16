@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,57 +7,55 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.BatteryChecker;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.Configs;
+import org.firstinspires.ftc.teamcode.Configs.ShooterConfigs;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.OpModes.Teleop;
+import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
+import org.firstinspires.ftc.teamcode.Utilities.InterpolatingDoubleTreeMap;
 import org.firstinspires.ftc.teamcode.Utilities.PIDController;
+
 
 public class Shooter extends SubsystemBase {
     private final DcMotorEx motorL;
     private final DcMotorEx motorR;
 //    private final ServoEx axisMotor;
     private final PIDController LshooterController;
-    private final PIDController RshooterController;
     private final SimpleMotorFeedforward LshooterFF;
+    private final PIDController RshooterController;
     private final SimpleMotorFeedforward RshooterFF;
     private double Lsetpoint;
     private double Rsetpoint;
     private double currentVelocity;
     private boolean lastState;
+    InterpolatingDoubleTreeMap shooterMap;
     private boolean currentState;
-    private final MultipleTelemetry telemetry;
-    public Shooter (HardwareMap hardwareMap, MultipleTelemetry telemetry) {
-        motorL = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorLid);
-        motorR = hardwareMap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorRid);
-//        axisMotor = hardwareMap.get(ServoEx.class, Constants.axisServoId);
+    private final VoltageSensor vs;
+    public Shooter (HardwareMap hardwareMap, VoltageSensor voltageSensor) {
+        vs = voltageSensor;
+        motorL = hardwareMap.get(DcMotorEx.class, ShooterConstants.shooterMotorLid);
+        motorR = hardwareMap.get(DcMotorEx.class, ShooterConstants.shooterMotorRid);
 
         LshooterController = new PIDController(
-                Configs.shooterConfigs.LshooterP,
-                Configs.shooterConfigs.LshooterI,
-                Configs.shooterConfigs.LshooterD);
+                ShooterConfigs.LeftShooter.LshooterP, 0, 0);
         RshooterController = new PIDController(
-                Configs.shooterConfigs.RshooterP,
-                Configs.shooterConfigs.RshooterI,
-                Configs.shooterConfigs.RshooterD);
+                ShooterConfigs.RightShooter.RshooterP, 0, 0);
 //
         LshooterFF = new SimpleMotorFeedforward(
-                Configs.shooterConfigs.LshooterKs,
-                Configs.shooterConfigs.LshooterKv);
+                ShooterConfigs.LeftShooter.LshooterKs,
+                ShooterConfigs.LeftShooter.LshooterKv);
         RshooterFF = new SimpleMotorFeedforward(
-                Configs.shooterConfigs.RshooterKs,
-                Configs.shooterConfigs.RshooterKv);
-//        shooterFF.minAchievableAcceleration()
+                ShooterConfigs.RightShooter.RshooterKs,
+                ShooterConfigs.RightShooter.RshooterKv);
+//        RshooterFF.maxAchievableAcceleration()
 
         motorL.setDirection(DcMotorSimple.Direction.FORWARD);
         motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorR.setDirection(DcMotorSimple.Direction.REVERSE);
         motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.telemetry = telemetry;
-
+        motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
     public void setLSetpoint(double desiredSetpoint) {
         Lsetpoint = desiredSetpoint;
@@ -72,11 +69,8 @@ public class Shooter extends SubsystemBase {
     public double getRightSetpoint() {
         return Rsetpoint;
     }
-    public boolean LatSetpoint() {
-        return Math.abs(getLeftSetpoint() - getLeftRPM()) < Math.abs(Configs.shooterConfigs.shooterSetpointTol);
-    }
-    public boolean RatSetpoint() {
-        return Math.abs(getRightSetpoint() - getRightRPM()) < Math.abs(Configs.shooterConfigs.shooterSetpointTol);
+    public boolean atSetpoint() {
+        return Math.abs(((getLeftSetpoint() + getRightSetpoint()) / 2) - motorL.getVelocity()) <= Math.abs(ShooterConfigs.Misc.shooterTolerance);
     }
     public void setPower(double power) {
         motorL.setPower(power);
@@ -88,119 +82,73 @@ public class Shooter extends SubsystemBase {
     public DcMotorEx getRightMotor() {
         return motorR;
     }
-    /**
-     * @return average power of both motors
-     */
     public double getPower() {
-        return (motorL.getPower()+ motorR.getPower())/2;
+        return (motorL.getPower() + motorR.getPower()) / 2;
     }
-//    /**
-//     * @param motor "sMotorL" or "sMotorR"
-//     * @return RPM of inputted motor
-//     */
-//    public double getRPM(String motor) {
-//        if(motor.equals(motorL.getDeviceName())) {
-//            return (getVelocity(motor)/Constants.shooterConstants.ticksPerRev*60);
-//        } else if (motor.equals(motorR.getDeviceName())) {
-//            return (getVelocity(motor)/Constants.shooterConstants.ticksPerRev*60);
-//        } else {
-//            return 500;
-//        }
-//    }
-
-    /**
-     * @return avg RPM of both motors
-     */
     public double getRightRPM() {
-        double motorRPM = ((motorR.getVelocity()/Constants.shooterConstants.ticksPerRev)*60);
-        return motorRPM / Constants.shooterConstants.gearRatio;
+        double motorRPM = ((motorR.getVelocity() / ShooterConstants.ticksPerRev) * 60);
+        return motorRPM / ShooterConstants.gearRatio;
     }
+
     public double getLeftRPM() {
-        double motorRPM = ((motorL.getVelocity()/Constants.shooterConstants.ticksPerRev)*60);
-        return motorRPM / Constants.shooterConstants.gearRatio;
+        double motorRPM = ((motorL.getVelocity() / ShooterConstants.ticksPerRev) * 60);
+        return motorRPM / ShooterConstants.gearRatio;
     }
-
-    public void runShooterR(double desiredRPM) {
-        double targetMotorRPM = desiredRPM * Constants.shooterConstants.gearRatio;
-        double targetMotorTicksPerSec = (targetMotorRPM / 60.0) * Constants.shooterConstants.ticksPerRev;
+    public void runShooterR(double desiredVelocity) {
+        double targetMotorTicksPerSec = desiredVelocity * ShooterConstants.gearRatio;
 
         double dv = RshooterController.calculate(motorR.getVelocity(), targetMotorTicksPerSec)
                 + RshooterFF.calculate(targetMotorTicksPerSec);
-        motorR.setPower(Math.max(Math.min(dv, Configs.shooterConfigs.maxSpeed), 0));
-//        double dv = RshooterController.calculate(motorR.getVelocity(), desiredVelocity)
-//                + RshooterFF.calculate(motorR.getVelocity(), desiredVelocity);
-//        motorR.setPower(Math.max(Math.min(dv, Configs.shooterConfigs.maxSpeed), 0));
+        double compensatedPower = dv * (ShooterConfigs.Misc.NominalVoltage / vs.getVoltage());
+        motorR.setPower(compensatedPower);
     }
-    public void runShooterL(double desiredRPM) {
-        double targetMotorRPM = desiredRPM * Constants.shooterConstants.gearRatio;
-        double targetMotorTicksPerSec = (targetMotorRPM / 60.0) * Constants.shooterConstants.ticksPerRev;
+    public void runShooterL(double desiredVelocity) {
+        double targetMotorTicksPerSec = desiredVelocity * ShooterConstants.gearRatio;
 
-        double dv = RshooterController.calculate(motorR.getVelocity(), targetMotorTicksPerSec)
-                + RshooterFF.calculate(targetMotorTicksPerSec);
-        motorR.setPower(Math.max(Math.min(dv, Configs.shooterConfigs.maxSpeed), 0));
-//        double dv = LshooterController.calculate(motorL.getVelocity(), desiredVelocity)
-//                + LshooterFF.calculate(motorL.getVelocity(), desiredVelocity);
-//        motorL.setPower(Math.max(Math.min(dv, Configs.shooterConfigs.maxSpeed), 0));
+        double dv = LshooterController.calculate(motorL.getVelocity(), targetMotorTicksPerSec)
+                + LshooterFF.calculate(targetMotorTicksPerSec);
+        double compensatedPower = dv * (ShooterConfigs.Misc.NominalVoltage / vs.getVoltage());
+        motorL.setPower(compensatedPower);
     }
-    /**
-     *
-     * @param motor "sMotorL" or "sMotorR"
-     * @return Current of inputted motor
-     */
-    public double getCurrent(String motor) {
-        if (motor.equals(motorL.getDeviceName())) {
-            return motorL.getCurrent(CurrentUnit.AMPS);
-        } else if (motor.equals(motorR.getDeviceName())) {
-            return motorR.getCurrent(CurrentUnit.AMPS);
-        } else {
-            return 6767;
-        }
-    }
-    /**
-     * @return Avg current of both motors
-     */
     public double getCurrent() {
-        return (motorL.getCurrent(CurrentUnit.AMPS) + motorR.getCurrent(CurrentUnit.AMPS))/2;
+        return (motorL.getCurrent(CurrentUnit.AMPS) + motorR.getCurrent(CurrentUnit.AMPS)) / 2;
     }
-
     public boolean justShotBall() {
-        boolean lastState = currentState;
-        currentState = getCurrent() < Configs.shooterConfigs.pollenCurrentThresh;
-        return (lastState && !currentState);
-    }
-
-    public String lastShotBall() {
-        if(justShotBall()) {
-            if(getCurrent()<Configs.shooterConfigs.nectarCurrentThresh){
-                return "lost nectar";
-            } else {
-                return "lost pollen";
-            }
-        } else {
-            return "cooked";
+        if (!atSetpoint()) {
+            currentState = false;
+            return false;
         }
-    }
 
+        boolean lastState = currentState;
+        currentState = getCurrent() > ShooterConfigs.Misc.ballShootingThreshold;
+        return lastState && !currentState;
+    }
     public void stopShooters() {
         setPower(0);
     }
 
-    public void periodic(MultipleTelemetry telemetry, double speed) {
-        LshooterController.setPID(Configs.shooterConfigs.LshooterP, Configs.shooterConfigs.LshooterI, Configs.shooterConfigs.LshooterD);
-        RshooterController.setPID(Configs.shooterConfigs.RshooterP, Configs.shooterConfigs.RshooterI, Configs.shooterConfigs.RshooterD);
-//        setSetpoint(Configs.shooterConfigs.manualShooterVelocity);
-        runShooterL(Lsetpoint);
+    public void periodic(Telemetry telemetry) {
+        LshooterController.setP(ShooterConfigs.LeftShooter.LshooterP);
+        RshooterController.setP(ShooterConfigs.RightShooter.RshooterP);
         runShooterR(Rsetpoint);
-        setLSetpoint(Configs.shooterConfigs.manualShooterVelocity);
-        setRSetpoint(Configs.shooterConfigs.manualShooterVelocity);
-//        telemetry.addData("setpoint", setpoint);
-        telemetry.addData("Left setpoint", getLeftSetpoint());
-        telemetry.addData("Right setpoint", getRightSetpoint());
-        telemetry.addData("ticks L", motorL.getVelocity());
-        telemetry.addData("ticks R", motorR.getVelocity());
-        telemetry.addData("rpm L", getLeftRPM());
-        telemetry.addData("rpm R", getRightRPM());
+        runShooterL(Lsetpoint);
 
+        if (telemetry != null) {
+            telemetry.addData("L :----------LEFT MOTOR----------", "L");
+            telemetry.addData("L: Left Current", motorL.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("L: Left Setpoint", getLeftSetpoint());
+            telemetry.addData("L: Left TPS", motorL.getVelocity());
+            telemetry.addData("L: Left Power", motorL.getPower());
+            telemetry.addData("L: Left Voltage", vs.getVoltage() * motorL.getPower());
+
+            telemetry.addData("R :----------RIGHT MOTOR----------", "R");
+            telemetry.addData("R: Right Current", motorR.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("R: Right Setpoint", getRightSetpoint());
+            telemetry.addData("R: Right TPS", motorR.getVelocity());
+            telemetry.addData("R: Right Power", motorR.getPower());
+            telemetry.addData("R: Right Voltage", vs.getVoltage() * motorR.getPower());
+        }
     }
+
 
 }
