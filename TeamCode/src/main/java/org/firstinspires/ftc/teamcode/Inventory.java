@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
-import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.ColourSensor;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter.Shooter;
 
 public class Inventory {
     char[] inv;
@@ -39,6 +37,14 @@ public class Inventory {
                 }
             }
         }
+    }
+
+    public char getNextBall() {
+        return inv[0];
+    }
+
+    public boolean isFull() {
+        return inv[3] == 'n';
     }
 
     public void periodic(MultipleTelemetry telemetry) {

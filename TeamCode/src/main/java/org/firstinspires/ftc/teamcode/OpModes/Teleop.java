@@ -10,15 +10,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.Configs;
-import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
+import org.firstinspires.ftc.teamcode.Inventory;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.ColourSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.GPE;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
-import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter.Shooter;
 
 @TeleOp(name="Delta", group="Teleop")
 public class Teleop extends LinearOpMode {
@@ -33,9 +33,8 @@ public class Teleop extends LinearOpMode {
     boolean rDpadPressed;
     boolean uDpadPressed;
     boolean dDpadPressed;
-    GamepadKeys.Trigger leftTrigger = GamepadKeys.Trigger.LEFT_TRIGGER;
-    GamepadKeys.Trigger rightTrigger = GamepadKeys.Trigger.RIGHT_TRIGGER;
     Timing.Timer indexTimer;
+    Inventory inventory;
     Intake s_intake;
     Drivetrain s_drivetrain;
     Limelight s_limelight;
@@ -44,9 +43,9 @@ public class Teleop extends LinearOpMode {
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
     Turret s_turret;
-    Transfer s_transfer;
     GPE s_GPE;
     VoltageSensor vs;
+    double netIntakePower;
 
     @Override
     public void runOpMode() {
@@ -54,6 +53,7 @@ public class Teleop extends LinearOpMode {
         gamepad = new GamepadEx(gamepad1);
 
         m_telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        inventory = new Inventory(new char[] {'n','n','n','n'}, s_coloursensor, s_shooter);
 
         s_drivetrain = new Drivetrain(hardwareMap);
         o_odometry = new Odometry(hardwareMap);
@@ -63,7 +63,6 @@ public class Teleop extends LinearOpMode {
         s_shooter = new Shooter(hardwareMap, vs);
         s_turret = new Turret(hardwareMap);
         s_GPE = new GPE(s_limelight, o_odometry);
-        s_transfer = new Transfer(hardwareMap);
 
         s_turret.zero();
 
@@ -72,6 +71,7 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
             globalPeriodic();
             initButtons();
+            netIntakePower = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
 
             s_drivetrain.drive(
                     -gamepad.getLeftY(),
@@ -79,14 +79,29 @@ public class Teleop extends LinearOpMode {
                     gamepad.getRightX()
             );
 
-            s_intake.runIntake(gamepad);
-            s_transfer.transfer(gamepad);
-            s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
-            s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+
+            s_intake.runIntake(netIntakePower);
+            s_intake.transfer(netIntakePower);
+            if (rbPressed) {
+                s_shooter.setCompression(inventory.getNextBall());
+                s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+                s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+            } else {
+                s_shooter.setLSetpoint(0);
+                s_shooter.setRSetpoint(0);
+            }
+
             s_turret.setSetpoint(Configs.TurretConfigs.setpoint);
 
-            if (uDpadPressed) {o_odometry.resetHeading();}
+            if(gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0) {
+                s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+                s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
+            } else {
+                s_shooter.setLSetpoint(0);
+                s_shooter.setRSetpoint(0);
+            }
 
+            if (uDpadPressed) {o_odometry.resetHeading();}
             if (dDpadPressed) {o_odometry.resetPosition();}
         }
     }
@@ -99,9 +114,9 @@ public class Teleop extends LinearOpMode {
         s_shooter.periodic(m_telemetry);
         s_coloursensor.periodic(m_telemetry);
         o_odometry.periodic(m_telemetry);
+        inventory.periodic(m_telemetry);
         m_telemetry.update();
     }
-
     public void initButtons() {
         gamepad.readButtons();
         aPressed = gamepad.isDown(GamepadKeys.Button.A);

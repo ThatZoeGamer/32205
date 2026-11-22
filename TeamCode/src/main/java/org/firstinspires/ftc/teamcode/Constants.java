@@ -22,6 +22,8 @@ public class Constants {
     public static class IntakeConstants {
         public static String intakeMotorId = "intake";
         public static String intakeServoId = "intakeServo";
+        public static final String stopperServoId = "stopperServo";
+        public static final String lifterServoId = "lifterServo";
     }
 
     public static class ShooterConstants {
@@ -30,6 +32,7 @@ public class Constants {
         public static final double gearRatio = 2;
         public static final String axisServoId = "axisServo";
         public static final double ticksPerRev = 24;
+        public static final String compressionServoId = "compressionServo";
     }
 
     public static class TurretConstants {

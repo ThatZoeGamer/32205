@@ -10,15 +10,14 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.Configs;
 import org.firstinspires.ftc.teamcode.Inventory;
-import org.firstinspires.ftc.teamcode.Subsystems.ColourSensor;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.ColourSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.GPE;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
-import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter.Shooter;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Delta", group="Auto")
 public class Autonomous extends LinearOpMode {
@@ -44,7 +43,6 @@ public class Autonomous extends LinearOpMode {
     MultipleTelemetry m_telemetry;
     Odometry o_odometry;
     Turret s_turret;
-    Transfer s_transfer;
     GPE s_GPE;
     Inventory inv;
     VoltageSensor vs;
@@ -63,7 +61,6 @@ public class Autonomous extends LinearOpMode {
         s_shooter = new Shooter(hardwareMap, vs);
         s_turret = new Turret(hardwareMap);
         s_GPE = new GPE(s_limelight, o_odometry);
-        s_transfer = new Transfer(hardwareMap);
         inv = new Inventory(new char[] {'B','P', 'R', 'B'}, s_coloursensor, s_shooter);
         s_turret.zero();
 
@@ -72,7 +69,7 @@ public class Autonomous extends LinearOpMode {
         while (opModeIsActive()) {
             globalPeriodic();
             s_intake.runIntake();
-            s_transfer.transfer();
+            s_intake.transfer();
             s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
             s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
         }

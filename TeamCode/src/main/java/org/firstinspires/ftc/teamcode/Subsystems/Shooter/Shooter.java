@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
@@ -6,14 +6,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Configs.ShooterConfigs;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
-import org.firstinspires.ftc.teamcode.Utilities.InterpolatingDoubleTreeMap;
 import org.firstinspires.ftc.teamcode.Utilities.PIDController;
 
 
@@ -21,41 +20,43 @@ public class Shooter extends SubsystemBase {
     private final DcMotorEx motorL;
     private final DcMotorEx motorR;
 //    private final ServoEx axisMotor;
+    private final Servo compressionServo;
     private final PIDController LshooterController;
     private final SimpleMotorFeedforward LshooterFF;
     private final PIDController RshooterController;
     private final SimpleMotorFeedforward RshooterFF;
     private double Lsetpoint;
     private double Rsetpoint;
-    private double currentVelocity;
-    private boolean lastState;
-    InterpolatingDoubleTreeMap shooterMap;
     private boolean currentState;
     private final VoltageSensor vs;
     public Shooter (HardwareMap hardwareMap, VoltageSensor voltageSensor) {
         vs = voltageSensor;
         motorL = hardwareMap.get(DcMotorEx.class, ShooterConstants.shooterMotorLid);
         motorR = hardwareMap.get(DcMotorEx.class, ShooterConstants.shooterMotorRid);
+        compressionServo = hardwareMap.get(Servo.class, ShooterConstants.compressionServoId);
 
         LshooterController = new PIDController(
                 ShooterConfigs.LeftShooter.LshooterP, 0, 0);
         RshooterController = new PIDController(
                 ShooterConfigs.RightShooter.RshooterP, 0, 0);
-//
+
         LshooterFF = new SimpleMotorFeedforward(
                 ShooterConfigs.LeftShooter.LshooterKs,
                 ShooterConfigs.LeftShooter.LshooterKv);
         RshooterFF = new SimpleMotorFeedforward(
                 ShooterConfigs.RightShooter.RshooterKs,
                 ShooterConfigs.RightShooter.RshooterKv);
-//        RshooterFF.maxAchievableAcceleration()
 
         motorL.setDirection(DcMotorSimple.Direction.FORWARD);
         motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorR.setDirection(DcMotorSimple.Direction.REVERSE);
         motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        compressionServo.setPosition(ShooterConfigs.Compressor.pollenPosition);
+        compressionServo.setDirection(Servo.Direction.FORWARD);
+//        compressionServo.scaleRange();
+
     }
     public void setLSetpoint(double desiredSetpoint) {
         Lsetpoint = desiredSetpoint;
@@ -72,35 +73,13 @@ public class Shooter extends SubsystemBase {
     public boolean atSetpoint() {
         return Math.abs(((getLeftSetpoint() + getRightSetpoint()) / 2) - motorL.getVelocity()) <= Math.abs(ShooterConfigs.Misc.shooterTolerance);
     }
-    public void setPower(double power) {
-        motorL.setPower(power);
-        motorR.setPower(power);
-    }
-    public DcMotorEx getLeftMotor() {
-        return motorL;
-    }
-    public DcMotorEx getRightMotor() {
-        return motorR;
-    }
-    public double getPower() {
-        return (motorL.getPower() + motorR.getPower()) / 2;
-    }
-    public double getRightRPM() {
-        double motorRPM = ((motorR.getVelocity() / ShooterConstants.ticksPerRev) * 60);
-        return motorRPM / ShooterConstants.gearRatio;
-    }
-
-    public double getLeftRPM() {
-        double motorRPM = ((motorL.getVelocity() / ShooterConstants.ticksPerRev) * 60);
-        return motorRPM / ShooterConstants.gearRatio;
-    }
     public void runShooterR(double desiredVelocity) {
         double targetMotorTicksPerSec = desiredVelocity * ShooterConstants.gearRatio;
 
         double dv = RshooterController.calculate(motorR.getVelocity(), targetMotorTicksPerSec)
                 + RshooterFF.calculate(targetMotorTicksPerSec);
         double compensatedPower = dv * (ShooterConfigs.Misc.NominalVoltage / vs.getVoltage());
-        motorR.setPower(compensatedPower);
+        motorR.setPower(dv);
     }
     public void runShooterL(double desiredVelocity) {
         double targetMotorTicksPerSec = desiredVelocity * ShooterConstants.gearRatio;
@@ -108,7 +87,7 @@ public class Shooter extends SubsystemBase {
         double dv = LshooterController.calculate(motorL.getVelocity(), targetMotorTicksPerSec)
                 + LshooterFF.calculate(targetMotorTicksPerSec);
         double compensatedPower = dv * (ShooterConfigs.Misc.NominalVoltage / vs.getVoltage());
-        motorL.setPower(compensatedPower);
+        motorL.setPower(dv);
     }
     public double getCurrent() {
         return (motorL.getCurrent(CurrentUnit.AMPS) + motorR.getCurrent(CurrentUnit.AMPS)) / 2;
@@ -123,8 +102,28 @@ public class Shooter extends SubsystemBase {
         currentState = getCurrent() > ShooterConfigs.Misc.ballShootingThreshold;
         return lastState && !currentState;
     }
-    public void stopShooters() {
-        setPower(0);
+
+    public void setCompression(char nextBall) {
+        switch (nextBall) {
+            case 'P':
+                compressionServo.setPosition(ShooterConfigs.Compressor.pollenPosition);
+                break;
+            case 'B':
+            case 'R':
+                compressionServo.setPosition(ShooterConfigs.Compressor.nectarPosition);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public String getCompression() {
+        if (Math.abs(compressionServo.getPosition() - ShooterConfigs.Compressor.pollenPosition) <= 1) {
+            return "Pollen";
+        } else if ((Math.abs(compressionServo.getPosition() - ShooterConfigs.Compressor.nectarPosition) <= 1)) {
+            return "Nectar";
+        }
+        return "Neither";
     }
 
     public void periodic(Telemetry telemetry) {
@@ -134,21 +133,24 @@ public class Shooter extends SubsystemBase {
         runShooterL(Lsetpoint);
 
         if (telemetry != null) {
-            telemetry.addData("L :----------LEFT MOTOR----------", "L");
-            telemetry.addData("L: Left Current", motorL.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("L: Left Setpoint", getLeftSetpoint());
-            telemetry.addData("L: Left TPS", motorL.getVelocity());
-            telemetry.addData("L: Left Power", motorL.getPower());
-            telemetry.addData("L: Left Voltage", vs.getVoltage() * motorL.getPower());
+            telemetry.addData("S :----------SHOOTER----------", "S");
+            telemetry.addData("SL :-------LEFT MOTOR-------", "SL");
+            telemetry.addData("SL: Left Current", motorL.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("SL: Left Setpoint", getLeftSetpoint());
+            telemetry.addData("SL: Left TPS", motorL.getVelocity());
+            telemetry.addData("SL: Left Power", motorL.getPower());
+            telemetry.addData("SL: Left Voltage", vs.getVoltage() * motorL.getPower());
 
-            telemetry.addData("R :----------RIGHT MOTOR----------", "R");
-            telemetry.addData("R: Right Current", motorR.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("R: Right Setpoint", getRightSetpoint());
-            telemetry.addData("R: Right TPS", motorR.getVelocity());
-            telemetry.addData("R: Right Power", motorR.getPower());
-            telemetry.addData("R: Right Voltage", vs.getVoltage() * motorR.getPower());
+            telemetry.addData("SR: :-------RIGHT MOTOR-------", "SR");
+            telemetry.addData("SR: Right Current", motorR.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("SR: Right Setpoint", getRightSetpoint());
+            telemetry.addData("SR: Right TPS", motorR.getVelocity());
+            telemetry.addData("SR: Right Power", motorR.getPower());
+            telemetry.addData("SR: Right Voltage", vs.getVoltage() * motorR.getPower());
+
+            telemetry.addData("SC: :-------COMPRESSOR-------", "SC");
+            telemetry.addData("SC: Compression Status", getCompression());
+            telemetry.addData("SC: Compressor Position", compressionServo.getPosition());
         }
     }
-
-
 }
