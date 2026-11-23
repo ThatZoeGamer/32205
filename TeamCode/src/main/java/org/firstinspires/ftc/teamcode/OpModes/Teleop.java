@@ -84,6 +84,7 @@ public class Teleop extends LinearOpMode {
             s_shooter.setLSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
             s_shooter.setRSetpoint(Configs.ShooterConfigs.Misc.manualShooterVelocity);
             s_turret.setSetpoint(Configs.TurretConfigs.setpoint);
+            s_turret.setSetpoint(-s_limelight.getTx());
 
             if (uDpadPressed) {o_odometry.resetHeading();}
 

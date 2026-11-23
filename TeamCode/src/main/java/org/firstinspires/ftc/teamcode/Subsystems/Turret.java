@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Configs.TurretConfigs;
 import org.firstinspires.ftc.teamcode.Constants.TurretConstants;
+import org.firstinspires.ftc.teamcode.Subsystems.Vision.Limelight;
 import org.firstinspires.ftc.teamcode.Utilities.PIDController;
 
 //TODO: Gonna add Limelight apriltag detection for the turret to turn the turret in the correct direction.
@@ -21,7 +22,11 @@ public class Turret extends SubsystemBase {
     private final DcMotorEx turretMotor;
     private double desiredVelocity;
 
+    Limelight s_limelight;
+    MultipleTelemetry m_telemetry;
+
     public Turret(HardwareMap hardwareMap) {
+        s_limelight = new Limelight(hardwareMap, m_telemetry);
         turretMotor = hardwareMap.get(DcMotorEx.class, TurretConstants.turretMotorId);
         turret = new PIDController(
                 TurretConfigs.turretP,

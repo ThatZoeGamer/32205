@@ -29,7 +29,7 @@ public class Limelight {
     public static Pose3D botPose;
     public Limelight(HardwareMap hardwareMap, MultipleTelemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        telemetry.setMsTransmissionInterval(11);
+//        telemetry.setMsTransmissionInterval(11);
         if(blueTeam) {
             limelight.pipelineSwitch(0);
         } else {
@@ -41,6 +41,7 @@ public class Limelight {
         int shootID = blueTeam ? 0 : 1;
         desiredTagID = new int[] {shootID};
     }
+
 
     public boolean checkDesiredTagID(int tagID) {
         for (int i : desiredTagID) {
