@@ -2,12 +2,16 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.bylazar.ftcontrol.panels.json.Pose;
+import com.bylazar.ftcontrol.panels.plugins.html.primitives.P;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Configs;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,25 +35,31 @@ public class Odometry extends SubsystemBase {
     public Pose2D getPose() {
         return pinpoint.getPosition();
     }
+    public void setPose(Pose2D newPose) {
+        pinpoint.setPosition(newPose);
+        pinpoint.update();
+    }
 
     public double getPinHeading() {
         return pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
     }
 
-    public void periodic(MultipleTelemetry telemetry) {
+    public void periodic(MultipleTelemetry m_telemetry, Telemetry telemetry) {
         pinpoint.update();
         Pose2D pose2D = pinpoint.getPosition();
 
-        if (telemetry != null) {
+        if (!Configs.Toggles.compMode) {
+            m_telemetry.addData("O :----------ODOMETRY----------", "O");
+            m_telemetry.addData("O: X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
+            m_telemetry.addData("O: Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
+            m_telemetry.addData("O: Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
+        } else {
             telemetry.addData("O :----------ODOMETRY----------", "O");
             telemetry.addData("O: X coordinate (IN): ", pose2D.getX(DistanceUnit.INCH));
             telemetry.addData("O: Y coordinate (IN): ", pose2D.getY(DistanceUnit.INCH));
             telemetry.addData("O: Pinpoint Heading (DEGREES): ", pose2D.getHeading(AngleUnit.DEGREES));
         }
     }
-
-
-
     public void configurePinpoint(){
         /*
          *  Set the odometry pod positions relative to the point that you want the position to be measured from.
@@ -60,7 +70,7 @@ public class Odometry extends SubsystemBase {
          *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
          *  Forward of center is a positive number, backwards is a negative number.
          */
-        pinpoint.setOffsets(-1, 0, DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
+        pinpoint.setOffsets(0, 0, DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

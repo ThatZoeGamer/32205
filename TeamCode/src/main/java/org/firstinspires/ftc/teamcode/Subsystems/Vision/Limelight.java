@@ -9,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Configs;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -56,10 +57,10 @@ public class Limelight {
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
-//                m_telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f",
-//                        fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-//                refreshDesiredID();
-//                m_telemetry.addData("CORRECT TAG ID?", checkDesiredTagID(fr.getFiducialId()));
+                m_telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+                        fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+                refreshDesiredID();
+                m_telemetry.addData("CORRECT TAG ID?", checkDesiredTagID(fr.getFiducialId()));
                 if (checkDesiredTagID(fr.getFiducialId())) {
                     targetFound = true;
                     desiredTag = fr;
@@ -75,10 +76,35 @@ public class Limelight {
             }
         }
     }
+    public void getAprilTagData(Telemetry telemetry) {
+        targetFound = false;
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+                        fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+                refreshDesiredID();
+                telemetry.addData("CORRECT TAG ID?", checkDesiredTagID(fr.getFiducialId()));
+                if (checkDesiredTagID(fr.getFiducialId())) {
+                    targetFound = true;
+                    desiredTag = fr;
+                    tX = fr.getTargetXDegrees();
+                    tY = fr.getTargetYDegrees();
+                    botPose = result.getBotpose();
+                    pitch = botPose.getOrientation().getPitch();
+                    roll = botPose.getOrientation().getRoll();
+                    yaw = botPose.getOrientation().getYaw();
+                } else {
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", fr.getFiducialId());
+                }
+            }
+        }
+    }
 
     public double getTargetRange() {
-        double angleToGoalRadians = Math.toRadians(65 + tY);
-        return (50 - 11)/(Math.tan(angleToGoalRadians));
+        double angleToGoalRadians = Math.toRadians(50 + tY);
+        return (50 - 10.5)/(Math.tan(angleToGoalRadians));
     }
     public double getYaw() {
         return yaw;
@@ -99,17 +125,27 @@ public class Limelight {
     public double getTx() {
         return tX;
     }
-
     public double getTy() {
         return tY;
     }
-    public void periodic(MultipleTelemetry telemetry) {
+
+    public void periodic(MultipleTelemetry m_telemetry, Telemetry telemetry) {
         refreshDesiredID();
         LLStatus status = limelight.getStatus();
-        telemetry.addData("LI :----------LIMELIGHT----------", "LI");
-        telemetry.addData("LI: Pipeline", "Index: %d, Type: %s", status.getPipelineIndex(), status.getPipelineType());
-        telemetry.addData("LI: TargetFound", foundTarget());
-        getAprilTagData(telemetry);
+        LLResult result = limelight.getLatestResult();
+        if (!Configs.Toggles.compMode) {
+            m_telemetry.addData("LI :----------LIMELIGHT----------", "LI");
+            m_telemetry.addData("LI: Pipeline", "Index: %d, Type: %s", status.getPipelineIndex(), status.getPipelineType());
+            m_telemetry.addData("LI: TargetFound", foundTarget());
+            m_telemetry.addData("LI: distance to tag", getTargetRange());
+            getAprilTagData(m_telemetry);
+        } else {
+//            telemetry.addData("LI :----------LIMELIGHT----------", "LI");
+//            telemetry.addData("LI: Pipeline", "Index: %d, Type: %s", status.getPipelineIndex(), status.getPipelineType());
+//            telemetry.addData("LI: TargetFound", foundTarget());
+//            telemetry.addData("LI: distance to tag", getTargetRange());
+//            getAprilTagData(telemetry);
+        }
         tX = limelight.getLatestResult().getTx();
         tY = limelight.getLatestResult().getTy();
         botPose = limelight.getLatestResult().getBotpose();

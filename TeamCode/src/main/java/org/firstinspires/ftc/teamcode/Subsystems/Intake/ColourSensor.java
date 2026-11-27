@@ -27,7 +27,7 @@ public class ColourSensor extends SubsystemBase {
 //        int relativeLayoutId = BlocksOpModeCompanion.hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", BlocksOpModeCompanion.hardwareMap.appContext.getPackageName());
 //        final View relativeLayout = ((Activity) BlocksOpModeCompanion.hardwareMap.appContext).findViewById(relativeLayoutId);
 
-        colourSensor = hardwareMap.get(ColorSensor.class, "colourSensor");
+//        colourSensor = hardwareMap.get(ColorSensor.class, "colourSensor");
     }
 
     public void bLedOn() { colourSensor.enableLed(bLedOn); }

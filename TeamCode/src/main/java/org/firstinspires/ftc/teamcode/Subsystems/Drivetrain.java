@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Drivetrain extends SubsystemBase {
@@ -23,7 +15,7 @@ public class Drivetrain extends SubsystemBase {
     private final DcMotor backLeft;
     private final DcMotor backRight;
 
-    private final BHI260IMU IMU;
+//    private final BHI260IMU IMU;
 
     private final Odometry odom;
     private double yawOffset;
@@ -50,7 +42,7 @@ public class Drivetrain extends SubsystemBase {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        IMU = hardwaremap.get(BHI260IMU.class, "imu");
+//        IMU = hardwaremap.get(BHI260IMU.class, "imu");
 
         yawOffset = odom.getPinHeading() - Constants.DrivetrainConstants.controlHubOffset;
     }
@@ -100,6 +92,14 @@ public class Drivetrain extends SubsystemBase {
     public void resetYaw() {
         yawOffset = getRawHeading() - Constants.DrivetrainConstants.controlHubOffset;
     }
+    public void stop() {
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+
 
     public void periodic(MultipleTelemetry telemetry) {}
 }
